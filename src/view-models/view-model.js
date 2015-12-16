@@ -110,5 +110,5 @@
       assertArgs(arguments, Element);
    };
 
-   coDefine('viewmodels.ViewModel', ViewModel);
+   cmDefine('viewmodels.ViewModel', ViewModel);
 })();

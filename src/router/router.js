@@ -4,11 +4,11 @@
 
 (function() {
 
-   var Route = coRequire('router.Route');
+   var Route = cmRequire('router.Route');
 
    function Router(on404) {
       assertArgs(arguments, insist.optional(Function));
-      this.on404_ = on404 || (function() { console.log('404 at', url); });
+      this.on404_ = on404 || (function(url) { console.log('404 at', url); });
       this.routes_ = [];
       this.historyLength_ = 0;
    }
@@ -19,8 +19,8 @@
    };
 
    Router.prototype.get = function(/* route [, callbacks...] */) {
-      var route = Array.prototype.shift.call(arguments);
-      var callbacks = arguments;
+      var route = arguments[0];
+      var callbacks = Array.prototype.slice.call(arguments, 1);
       assertOfType(route, String)
       assertOfType(callbacks, arrayOf(Function))
       this.routes_.push(new Route(route, callbacks));
@@ -73,7 +73,7 @@
    // Calls the proper callbacks based on the supplied URL.
    Router.prototype.notify_ = function(url) {
       assertArgs(arguments, String)
-      for (var i = 0, len = this.routes_; i < len; i++) {
+      for (var i = 0, len = this.routes_.length; i < len; i++) {
          if (this.routes_[i].attemptToHandleUrl(url)) {
             return;
          }
@@ -101,6 +101,6 @@
    };
 
    
-   coDefine('router.Router', Router);
+   cmDefine('router.Router', Router);
 })();
 

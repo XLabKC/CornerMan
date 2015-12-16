@@ -5,9 +5,9 @@
 
 (function(scope) {
    scope.co = {
-      'Router': coRequire('router/router'),
-      'ContentViewModel': coRequire('view-models/content-view-model'),
-      'ControlViewModel': coRequire('view-models/control-view-model'),
-      'ViewModel': coRequire('view-models/view-model')
+      'Router': cmRequire('router/router'),
+      'ContentViewModel': cmRequire('view-models/content-view-model'),
+      'ControlViewModel': cmRequire('view-models/control-view-model'),
+      'ViewModel': cmRequire('view-models/view-model')
    };
 })(this);

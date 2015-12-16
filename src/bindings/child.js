@@ -1,13 +1,12 @@
 //= require base.js
 
-function() {
-   var ViewModel = require("lib.vm.ViewModel");
+(function() {
 
    var templateInit = ko.bindingHandlers.template.init
    var templateUpdate = ko.bindingHandlers.template.update
 
    var BOUND_ELEMENT = 'corner-man:child-boundElement';
-   var jstTemplateEngine = new ko.jstTemplateEngine()
+   // var jstTemplateEngine = new ko.jstTemplateEngine()
 
    // Use this function to minimize what is retained in the closure.
    var createValueAccessorFn = function(data) {
@@ -26,6 +25,7 @@ function() {
          return null;
       }
 
+      var ViewModel = cmRequire("viewmodels.ViewModel");
       assertOfType(value, [String, ViewModel, Object]);
       var child = null;
       var ifCondition = true
@@ -67,12 +67,12 @@ function() {
          ko.utils.domData.set(element, BOUND_ELEMENT, child);
       }
       return createValueAccessorFn({
-         'name': child.template
-         'data': child
-         'templateEngine': jstTemplateEngine
+         'name': child.template,
+         'data': child,
+         'templateEngine': jstTemplateEngine,
          'if': ifCondition   
       });
-   });
+   };
 
    // Add child to the knockout binding handles.
    ko.bindingHandlers.child = {

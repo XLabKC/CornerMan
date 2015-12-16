@@ -63,6 +63,6 @@
       this.callbacks_[callbackIndex](req, next);
    };
 
-   coDefine('router.Route', Route);
+   cmDefine('router.Route', Route);
 })();
 

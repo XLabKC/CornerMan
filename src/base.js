@@ -1,7 +1,7 @@
 (function(scope) {
    var root = {};
 
-   scope.coDefine = function(namespace, obj) {
+   scope.cmDefine = function(namespace, obj) {
       var namespace = namespace.replace(/\./g, '$');
       if (root[namespace]) {
          throw Error('Namespace already exists: ' + namespace);
@@ -9,7 +9,7 @@
       root[namespace] = obj;
    };
 
-   scope.coRequire = function(namespace) {
+   scope.cmRequire = function(namespace) {
       var namespace = namespace.replace(/\./g, '$');
       if (!root[namespace]) {
          throw Error('Unknown namespace: ' + namespace); 
