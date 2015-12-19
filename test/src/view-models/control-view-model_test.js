@@ -10,12 +10,12 @@ describe('viewmodels.ControlViewModel', function() {
 
       it('should set template if supplied to constructor', function() {
          var vm = new ControlViewModel('foobar', 0);
-         expect(vm.template()).to.equal('foobar');
+         expect(vm.getTemplate()).to.equal('foobar');
       });
 
       it('should set the order', function() {
          var vm = new ControlViewModel('foobar', 0);
-         expect(vm.order()).to.equal(0);
+         expect(vm.getOrder()).to.equal(0);
       });
    });
 });

@@ -5,67 +5,70 @@
 (function() {
    var ViewModel = cmRequire('viewmodels.ViewModel');
    var ControlViewModel = cmRequire('viewmodels.ControlViewModel');
+   var CONTROL_KEY_PREFIX = 'control_key:';
 
    function ContentViewModel(template) {
       assertArgs(arguments, optional(String));
       ViewModel.call(this, template);
-      this.controlSetsInternal_ = {}
-      this.controlSets_ = {} 
+      this.keysToControlsObservables_ = {};
    };
    ContentViewModel.prototype = Object.create(ViewModel.prototype);
    ContentViewModel.prototype.constructor = ContentViewModel;
 
-   ContentViewModel.prototype.getControlSetObservable = function(key) {
+   ContentViewModel.prototype.getControlsForKey = function(key) {
       assertArgs(arguments, String);
-      if (!this.controlSets_[key]) {
-         this.controlSets_[key] = ko.pureComputed(this.computeControlSet_.bind(this, key));
-      }
-      return this.controlSets_[key];
+      return this.getControlsObservableForKey(key)();
    };
 
-   ContentViewModel.prototype.addControl = function(key, control) {
+   ContentViewModel.prototype.getControlsObservableForKey = function(key) {
+      assertArgs(arguments, String);
+      return this.getControlsObservableForKeyInternal_(CONTROL_KEY_PREFIX + key);
+   };
+
+   ContentViewModel.prototype.addControlAtKey = function(key, control) {
       assertArgs(arguments, String, ControlViewModel);
-      var set = this.controlSetsInternal_[key];
-      if (set) {
-         set.push(control);
-      } else {
-         this.controlSetsInternal_[key] = ko.observableArray([control]);
-      }
+      this.addChildAtKey(CONTROL_KEY_PREFIX + key, control);
    };
 
-   ContentViewModel.prototype.removeControl = function(key, control) {
+   ContentViewModel.prototype.removeControlAtKey = function(key, control) {
       assertArgs(arguments, String, ControlViewModel);
-      if (this.controlSetsInternal_[key]) {
-         this.controlSetsInternal_[key].remove(control);
-      }
+      return this.removeChildAtKey(CONTROL_KEY_PREFIX + key, control);
    };
 
-   ContentViewModel.prototype.computeControlSet_ = function(key) {
-      var set = this.getControlSetInternalObservable_(key)();
-      var children = this.getChildren();
-      for (var i = 0, len = children.length; i < len; i++) {
-         var child = children[i];
-         if (child instanceof ContentViewModel) {
-            var observable = child.getControlSetObservable(key);
-            set = set.concat(observable());
+   ContentViewModel.prototype.getControlsObservableForKeyInternal_ = function(controlKey) {
+      assertArgs(arguments, String);
+      if (!this.keysToControlsObservables_[controlKey]) {
+         this.keysToControlsObservables_[controlKey] =
+               ko.pureComputed(this.computeControls_.bind(this, controlKey));
+      }
+      return this.keysToControlsObservables_[controlKey];
+   };
+
+   ContentViewModel.prototype.computeControls_ = function(controlKey) {
+      var controls = this.getChildrenForKey(controlKey);
+      var keys = this.getKeys();
+      for (var i = 0, len = keys.length; i < len; i++) {
+         var key = keys[i];
+         if (key.indexOf(CONTROL_KEY_PREFIX) == 0) {
+            continue;
+         }
+         var children = this.getChildrenForKey(key);
+         for (var j = 0, childrenLength = children.length; j < childrenLength; j++) {
+            var child = children[j];
+            if (child instanceof ContentViewModel) {
+               var observable = child.getControlsObservableForKeyInternal_(controlKey);
+               controls = controls.concat(observable());
+            }
          }
       }
-      set.sort(controlComparator);
-      return set;
-   };
-
-   ContentViewModel.prototype.getControlSetInternalObservable_ = function(key) {
-      assertArgs(arguments, String);
-      if (!this.controlSetsInternal_[key]) {
-         this.controlSetsInternal_[key] = ko.observableArray();
-      }
-      return this.controlSetsInternal_[key];
+      controls.sort(controlComparator);
+      return controls;
    };
 
    var controlComparator = function (a, b) {
       assertArgs(arguments, ControlViewModel, ControlViewModel);
-      var orderA = a.order();
-      var orderB = b.order();
+      var orderA = a.getOrder();
+      var orderB = b.getOrder();
       if (orderA < orderB) return -1;
       if (orderA == orderB) return 0;
       return 1;

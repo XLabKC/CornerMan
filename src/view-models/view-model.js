@@ -1,9 +1,12 @@
 //= require base.js
 
 (function() {
+   var AVAILABLE_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var RANDOM_KEY_LENGTH = 10;
+
    function ViewModel(template) {
       assertArgs(arguments, optional(String))
-      this.template = ko.observable(template || null);
+      this.template_ = ko.observable(template || null);
       this.hasTemplate = ko.pureComputed(this.computeHasTemplate_.bind(this));
       this.parent_ = ko.observable(null);
       this.parent_.subscribe(this.onParentWillChange_, this, 'beforeChange');
@@ -26,6 +29,17 @@
       REMOVED_FROM_PARENT: 'self-removed-from-parent',
       BOUND_TO_ELEMENT: 'self-bound-to-element',
       UNBOUND_FROM_ELEMENT: 'self-unbound-from-element'
+   };
+
+   ViewModel.generateKey = function(length, availableCharacters) {
+      var args = assertArgs(arguments, optional(Number), optional(String));
+      length = args[0] || RANDOM_KEY_LENGTH;
+      characters = args[1] || AVAILABLE_CHARACTERS;
+      keySegments = [];
+      for (var i = 0; i < length; i++) {
+         keySegments.push(characters.charAt(Math.floor(Math.random() * characters.length)));
+      }
+      return keySegments.join('');
    };
 
    ViewModel.prototype.addListener = function(eventType, callback) {
@@ -54,6 +68,18 @@
 
    ViewModel.prototype.getParent = function() {
       return this.parent_();
+   };
+
+   ViewModel.prototype.getTemplate = function() {
+      return this.template_();
+   };
+
+   ViewModel.prototype.getKeys = function() {
+      return this.keys_();
+   };
+
+   ViewModel.prototype.getKeysObservable = function() {
+      return this.keys_;
    };
 
    ViewModel.prototype.getChildren = function() {
@@ -93,7 +119,7 @@
       return null;
    };
 
-   ViewModel.prototype.addChildForKey = function(key, viewModel) {
+   ViewModel.prototype.addChildAtKey = function(key, viewModel) {
       assertArgs(arguments, String, ViewModel);
       var currentParent = viewModel.getParent();
       if (currentParent === this) {
@@ -103,16 +129,30 @@
             return false;
          }
          this.removeChildAtKeySilently_(currentKey, viewModel);
-         this.getChildrenObservableForKey(key).push(viewModel);
+         
+         // We can't use #getChildrenObservableForKey because we need to add the view model to the
+         // new observable array before adding the key so that any subscribes will be able to access
+         // the children immediately.
+         if (!this.keysToChildrenObservables_[key]) {
+            this.keysToChildrenObservables_[key] = ko.observableArray([viewModel]);
+            this.keys_.push(key);
+         } else {
+            this.keysToChildrenObservables_[key].push([viewModel]);
+         }
          viewModel.dispatchEvent_(ViewModel.Events.MOVED_KEYS, this, currentKey, key);
          this.dispatchEvent_(ViewModel.Events.CHILD_MOVED, viewModel, currentKey, key);
          return true;
       }
-      var childrenObservable = this.getChildrenObservableForKey(key);
-      
-      // Silently update the observables value so that the parents are properly set before an update
-      // occurs.
-      childrenObservable.peek().push(viewModel);
+
+      // Silently update the observables values so that the parents are properly set before an
+      // update occurs.
+      var isNewKey = !this.keysToChildrenObservables_[key];
+      if (isNewKey) {
+         this.keysToChildrenObservables_[key] = ko.observableArray([viewModel]);
+         this.keys_.peek().push(key);
+      } else {
+         this.keysToChildrenObservables_[key].peek().push(viewModel);
+      }
 
       if (currentParent) {
          var currentKey = currentParent.getKeyForChild(viewModel);
@@ -120,20 +160,40 @@
             true /* storeRemovedChild */);
       }
       viewModel.parent_(this);
-      childrenObservable.valueHasMutated();
+
+      // Now that everything is setup properly, let subscribers know about the updates.
+      if (isNewKey) {
+         this.keys_.valueHasMutated();
+      } else {
+         this.keysToChildrenObservables_[key].valueHasMutated();
+      }
       return true;
    };
 
-   ViewModel.prototype.addChildrenForKey = function(key, viewModels) {
+   ViewModel.prototype.addChildrenAtKey = function(key, viewModels) {
       assertArgs(arguments, String, arrayOf(ViewModel));
       for (var i = 0, len = viewModels.length; i < len; i++) {
-         this.addChildForKey(key, viewModels[i]);
+         this.addChildAtKey(key, viewModels[i]);
       };
+   };
+
+   ViewModel.prototype.addChild = function(viewModel) {
+      assertArgs(arguments, ViewModel);
+      var key = ViewModel.generateKey();
+      this.addChildAtKey(key, viewModel);
+      return key;
+   };
+
+   ViewModel.prototype.addChildren = function(viewModel) {
+      assertArgs(arguments, arrayOf(ViewModel));
+      var key = ViewModel.generateKey();
+      this.addChildrenAtKey(key, viewModel);
+      return key;
    };
 
    ViewModel.prototype.removeChildAtKey = function(key, viewModel) {
       assertArgs(arguments, String, ViewModel);
-      var wasRemoved = this.removeChildAtKeySilently_(key, viewModel);
+      var wasRemoved = this.removeChildAtKeySilently_(key, viewModel, true /* storeRemovedChild */);
       if (wasRemoved) {
          viewModel.parent_(null);   
       } 
@@ -155,7 +215,7 @@
       for (var i = 0, len = children.length; i < len; i++) {
          this.removeChildAtKey(key, children[i]);
       }
-      this.addChildrenForKey(key, viewModels);
+      this.addChildrenAtKey(key, viewModels);
    };
 
    ViewModel.prototype.computeChildrenObservable_ = function() {
@@ -169,7 +229,7 @@
    };
 
    ViewModel.prototype.computeHasTemplate_ = function() {
-      return this.template() != null;
+      return this.template_() != null;
    };
 
    ViewModel.prototype.removeChildAtKeySilently_ = function(key, viewModel, storeRemovedChild) {

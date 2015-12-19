@@ -1,3 +1,7 @@
+/**
+ * insist-type v1.2.1
+ */
+ 
 (function () {
 var root = this;
 var previousInstance = root.insist;

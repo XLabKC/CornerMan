@@ -10,7 +10,7 @@ describe('viewmodels.ViewModel', function() {
 
       it('should set template if supplied to constructor', function() {
          var vm = new ViewModel('foobar');
-         expect(vm.template()).to.equal('foobar');
+         expect(vm.getTemplate()).to.equal('foobar');
       });
    });
 
@@ -40,12 +40,12 @@ describe('viewmodels.ViewModel', function() {
       });
    });
 
-   describe('addChildForKey', function() {
+   describe('addChildAtKey', function() {
 
       it('should add the view model as a child', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          expect(vm.getChildrenForKey('foo')).to.include(child);
       });
 
@@ -53,8 +53,8 @@ describe('viewmodels.ViewModel', function() {
          var oldParent = new ViewModel();
          var child = new ViewModel();
          var newParent = new ViewModel();
-         oldParent.addChildForKey('foo', child);
-         newParent.addChildForKey('bar', child);
+         oldParent.addChildAtKey('foo', child);
+         newParent.addChildAtKey('bar', child);
          expect(oldParent.getChildrenForKey('foo')).to.not.include(child);
       });
       
@@ -63,7 +63,7 @@ describe('viewmodels.ViewModel', function() {
          var child = new ViewModel();
          var spy = sinon.spy();
          vm.addListener(ViewModel.Events.CHILD_ADDED, spy);
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(child, 'foo')).to.be.true();
       });
@@ -73,7 +73,7 @@ describe('viewmodels.ViewModel', function() {
          var child = new ViewModel();
          var spy = sinon.spy();
          child.addListener(ViewModel.Events.ADDED_TO_PARENT, spy);
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(vm, 'foo')).to.be.true();
       });
@@ -83,10 +83,10 @@ describe('viewmodels.ViewModel', function() {
          var child = new ViewModel();
          var newParent = new ViewModel();
          var spy = sinon.spy();
-         oldParent.addChildForKey('foo', child);
+         oldParent.addChildAtKey('foo', child);
          newParent.addListener(ViewModel.Events.CHILD_ADDED, spy);
          
-         newParent.addChildForKey('foo', child);
+         newParent.addChildAtKey('foo', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(child, 'foo')).to.be.true();
       });
@@ -96,10 +96,10 @@ describe('viewmodels.ViewModel', function() {
          var child = new ViewModel();
          var newParent = new ViewModel();
          var spy = sinon.spy();
-         oldParent.addChildForKey('foo', child);
+         oldParent.addChildAtKey('foo', child);
          child.addListener(ViewModel.Events.ADDED_TO_PARENT, spy);
          
-         newParent.addChildForKey('foo', child);
+         newParent.addChildAtKey('foo', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(newParent, 'foo')).to.be.true();
       });
@@ -109,10 +109,10 @@ describe('viewmodels.ViewModel', function() {
          var child = new ViewModel();
          var newParent = new ViewModel();
          var spy = sinon.spy();
-         oldParent.addChildForKey('foo', child);
+         oldParent.addChildAtKey('foo', child);
          oldParent.addListener(ViewModel.Events.CHILD_REMOVED, spy);
          
-         newParent.addChildForKey('bar', child);
+         newParent.addChildAtKey('bar', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(child, 'foo')).to.be.true();
       });
@@ -122,10 +122,10 @@ describe('viewmodels.ViewModel', function() {
          var child = new ViewModel();
          var newParent = new ViewModel();
          var spy = sinon.spy();
-         oldParent.addChildForKey('foo', child);
+         oldParent.addChildAtKey('foo', child);
          child.addListener(ViewModel.Events.REMOVED_FROM_PARENT, spy);
          
-         newParent.addChildForKey('bar', child);
+         newParent.addChildAtKey('bar', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(oldParent, 'foo')).to.be.true();
       });
@@ -134,10 +134,10 @@ describe('viewmodels.ViewModel', function() {
          var parent = new ViewModel();
          var child = new ViewModel();
          var spy = sinon.spy();
-         parent.addChildForKey('foo', child);
+         parent.addChildAtKey('foo', child);
          parent.addListener(ViewModel.Events.CHILD_MOVED, spy);
          
-         parent.addChildForKey('bar', child);
+         parent.addChildAtKey('bar', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(child, 'foo', 'bar')).to.be.true();
       });
@@ -146,22 +146,22 @@ describe('viewmodels.ViewModel', function() {
          var parent = new ViewModel();
          var child = new ViewModel();
          var spy = sinon.spy();
-         parent.addChildForKey('foo', child);
+         parent.addChildAtKey('foo', child);
          child.addListener(ViewModel.Events.MOVED_KEYS, spy);
          
-         parent.addChildForKey('bar', child);
+         parent.addChildAtKey('bar', child);
          expect(spy.calledOnce).to.be.true();
          expect(spy.calledWith(parent, 'foo', 'bar')).to.be.true();
       });
    });
 
-   describe('addChildrenForKey', function() {
+   describe('addChildrenAtKey', function() {
 
       it('should add the view models as a children', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildrenForKey('foo', [child1, child2]);
+         vm.addChildrenAtKey('foo', [child1, child2]);
          expect(vm.getChildrenForKey('foo')).to.include.members([child1, child2]);
       });
 
@@ -171,11 +171,83 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         oldParent1.addChildForKey('foo', child1);
-         oldParent2.addChildForKey('foo', child2);
-         vm.addChildrenForKey('foo', [child1, child2]);
+         oldParent1.addChildAtKey('foo', child1);
+         oldParent2.addChildAtKey('foo', child2);
+         vm.addChildrenAtKey('foo', [child1, child2]);
          expect(oldParent1.getChildrenForKey('foo')).to.not.include(child1);
          expect(oldParent2.getChildrenForKey('foo')).to.not.include(child2);
+      });
+   });
+
+   describe('addChild', function() {
+
+      it('should add the view model as a child', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         vm.addChild(child);
+         expect(vm.getChildren()).to.include(child);
+      });
+
+      it('should return the key at which the child was added', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         var key = vm.addChild(child);
+         expect(key).to.exist();
+         expect(vm.getChildrenForKey(key)).to.include(child);
+      });
+   });
+
+   describe('addChildren', function() {
+
+      it('should add the view models as a children', function() {
+         var vm = new ViewModel();
+         var child1 = new ViewModel();
+         var child2 = new ViewModel();
+         vm.addChildren([child1, child2]);
+         expect(vm.getChildren()).to.include.members([child1, child2]);
+      });
+
+      it('should return the key at which the child was added', function() {
+         var vm = new ViewModel();
+         var child1 = new ViewModel();
+         var child2 = new ViewModel();
+         var key = vm.addChildren([child1, child2]);
+         expect(key).to.exist();
+         expect(vm.getChildrenForKey(key)).to.include.members([child1, child2]);
+      });
+   });
+
+   describe('getKeys', function() {
+
+      it('should return an empty array when there are no children', function() {
+         var vm = new ViewModel();
+         expect(vm.getKeys()).to.have.length(0);
+      });
+
+      it('should return all keys', function() {
+         var vm = new ViewModel();
+         var child1 = new ViewModel();
+         var child2 = new ViewModel();
+         vm.addChildAtKey('foo', child1);
+         vm.addChildAtKey('bar', child2);
+         expect(vm.getKeys()).to.include.members(['foo', 'bar']);
+      });
+   });
+
+   describe('getKeysObservable', function() {
+
+      it('should return an observable containing an empty array when there are no children', function() {
+         var vm = new ViewModel();
+         expect(vm.getKeysObservable()()).to.have.length(0);
+      });
+
+      it('should return an observable containing all keys', function() {
+         var vm = new ViewModel();
+         var child1 = new ViewModel();
+         var child2 = new ViewModel();
+         vm.addChildAtKey('foo', child1);
+         vm.addChildAtKey('bar', child2);
+         expect(vm.getKeysObservable()()).to.include.members(['foo', 'bar']);
       });
    });
 
@@ -190,8 +262,8 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildForKey('foo', child1);
-         vm.addChildForKey('bar', child2);
+         vm.addChildAtKey('foo', child1);
+         vm.addChildAtKey('bar', child2);
          expect(vm.getChildren()).to.include.members([child1, child2]);
       });
    });
@@ -207,8 +279,8 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildForKey('foo', child1);
-         vm.addChildForKey('bar', child2);
+         vm.addChildAtKey('foo', child1);
+         vm.addChildAtKey('bar', child2);
          expect(vm.getChildrenObservable()()).to.include.members([child1, child2]);
       });
    });
@@ -224,8 +296,8 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildForKey('foo', child1);
-         vm.addChildForKey('bar', child2);
+         vm.addChildAtKey('foo', child1);
+         vm.addChildAtKey('bar', child2);
          expect(vm.getChildrenForKey('foo')).to.include(child1);
          expect(vm.getChildrenForKey('foo')).to.not.include(child2);
       });
@@ -242,8 +314,8 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildForKey('foo', child1);
-         vm.addChildForKey('bar', child2);
+         vm.addChildAtKey('foo', child1);
+         vm.addChildAtKey('bar', child2);
          expect(vm.getChildrenObservableForKey('foo')()).to.include(child1);
          expect(vm.getChildrenObservableForKey('foo')()).to.not.include(child2);
       });
@@ -260,7 +332,7 @@ describe('viewmodels.ViewModel', function() {
       it('should return key of child when child of the view model', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          expect(vm.getKeyForChild(child)).to.equal('foo');
       });
    });
@@ -276,21 +348,21 @@ describe('viewmodels.ViewModel', function() {
       it('should return false when the child isn\'t at the given key', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          expect(vm.removeChildAtKey('bar', child)).to.be.false();
       });
 
       it('should return true when the child is at given key', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          expect(vm.removeChildAtKey('foo', child)).to.be.true();
       });
 
       it('should remove the child when the child is at given key', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          vm.removeChildAtKey('foo', child);
          expect(vm.getChildrenForKey('foo')).to.not.include(child);
       });
@@ -298,9 +370,33 @@ describe('viewmodels.ViewModel', function() {
       it('should set the child\'s parent to null when the child is at given key', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          vm.removeChildAtKey('foo', child);
          expect(child.getParent()).to.be.null();
+      });
+
+      it('should dispatch CHILD_REMOVED event from parent when child is at given key', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         vm.addChildAtKey('foo', child);
+         var spy = sinon.spy();
+         vm.addListener(ViewModel.Events.CHILD_REMOVED, spy);
+         
+         vm.removeChildAtKey('foo', child);
+         expect(spy.calledOnce).to.be.true();
+         expect(spy.calledWith(child, 'foo')).to.be.true();
+      });
+
+      it('should dispatch REMOVED_FROM_PARENT event from child when child is at given key', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         vm.addChildAtKey('foo', child);
+         var spy = sinon.spy();
+         child.addListener(ViewModel.Events.REMOVED_FROM_PARENT, spy);
+         
+         vm.removeChildAtKey('foo', child);
+         expect(spy.calledOnce).to.be.true();
+         expect(spy.calledWith(vm, 'foo')).to.be.true();
       });
    });
 
@@ -314,7 +410,7 @@ describe('viewmodels.ViewModel', function() {
       it('should remove the child when the child is at given key', function() {
          var vm = new ViewModel();
          var child = new ViewModel();
-         vm.addChildForKey('foo', child);
+         vm.addChildAtKey('foo', child);
          vm.removeChild(child);
          expect(vm.getChildrenForKey('foo')).to.not.include(child);
       });
@@ -326,7 +422,7 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildForKey('foo', child1);
+         vm.addChildAtKey('foo', child1);
          vm.replaceChildrenAtKey('foo', [child2]);
          expect(vm.getChildrenForKey('foo')).to.not.include(child1);
       });
@@ -335,7 +431,7 @@ describe('viewmodels.ViewModel', function() {
          var vm = new ViewModel();
          var child1 = new ViewModel();
          var child2 = new ViewModel();
-         vm.addChildForKey('foo', child1);
+         vm.addChildAtKey('foo', child1);
          vm.replaceChildrenAtKey('foo', [child2]);
          expect(vm.getChildrenForKey('foo')).to.include(child2);
       });
