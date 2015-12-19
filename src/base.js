@@ -29,5 +29,6 @@
    scope.nullable = insist.nullable;
    scope.anything = insist.anything;
    scope.optional = insist.optional;
+   scope.ofEnum = insist['enum'];
 
 })(this);

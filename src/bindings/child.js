@@ -61,9 +61,9 @@
       if (currentChild != child) {
          // The child has been changed, notify the old child and the new child.
          if (currentChild) {
-            currentChild.unboundFromElement(element);   
+            currentChild.unboundFromElement_(element);   
          }
-         child.boundToElement(element);
+         child.boundToElement_(element);
          ko.utils.domData.set(element, BOUND_ELEMENT, child);
       }
       return createValueAccessorFn({
@@ -80,7 +80,7 @@
          ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             var currentChild = ko.utils.domData.get(element, BOUND_ELEMENT);
             if (currentChild) {
-               currentChild.unboundFromElement(element);   
+               currentChild.unboundFromElement_(element);   
             }
          });
          var accessor = makeTemplateValueAccessor(element, valueAccessor, bindingContext['$data']);

@@ -49,7 +49,7 @@ app.get('/', function (req, res) {
    res.send(createHtmlForScripts('all_tests.js'));
 });
 
-/** Serves a page that tests a single test file against all files in /assets/js. */
+/** Serves a page that tests a single test file against all files in /src. */
 app.get('*', function (req, res) {
    var pathName = url.parse(req.url).pathname.substring(1);
    res.send(createHtmlForScripts(pathName));
