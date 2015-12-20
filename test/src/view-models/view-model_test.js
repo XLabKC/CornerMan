@@ -14,6 +14,75 @@ describe('viewmodels.ViewModel', function() {
       });
    });
 
+   describe('childObservable', function() {
+
+      it('should return an observable', function() {
+         var vm = new ViewModel();
+         expect(ko.isObservable(vm.childObservable())).to.be.true();
+      });
+
+      it('should add the new child to the view model when the value is updated', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         var observable = vm.childObservable();
+         observable(child);
+         expect(observable()).to.equal(child);
+         expect(vm.getChildrenForKey(observable.getKey())).to.include(child);
+      });
+
+      it('should remove the old child from the view model when the value is updated', function() {
+         var vm = new ViewModel();
+         var child1 = new ViewModel();
+         var child2 = new ViewModel();
+         var observable = vm.childObservable();
+         observable(child1);
+         observable(child2);
+         expect(observable()).to.equal(child2);
+         expect(vm.getChildrenForKey(observable.getKey())).to.not.include(child1);
+         expect(vm.getChildrenForKey(observable.getKey())).to.include(child2);
+      });
+   });
+
+   describe('childrenObservable', function() {
+      it('should return an observable', function() {
+         var vm = new ViewModel();
+         expect(ko.isObservable(vm.childrenObservable())).to.be.true();
+      });
+
+      it('should add the new child to the view model when a child is added', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         var observableArray = vm.childrenObservable();
+         observableArray.push(child);
+         expect(observableArray()).to.include(child);
+         expect(vm.getChildrenForKey(observableArray.getKey())).to.include(child);
+      });
+
+      it('should remove the child from the view model when a child is removed', function() {
+         var vm = new ViewModel();
+         var child = new ViewModel();
+         var observableArray = vm.childrenObservable();
+         observableArray.push(child);
+         observableArray.pop();
+         expect(observableArray()).to.not.include(child);
+         expect(vm.getChildrenForKey(observableArray.getKey())).to.not.include(child);
+      });
+
+      it('should do nothing when a child is moved within the underlying array', function() {
+         var vm = new ViewModel();
+         var child1 = new ViewModel();
+         var child2 = new ViewModel();
+         var observableArray = vm.childrenObservable([child1, child2]);
+         var addedSpy = sinon.spy();
+         var removedSpy = sinon.spy();
+         vm.addListener(ViewModel.Events.CHILD_REMOVED, addedSpy);
+         vm.addListener(ViewModel.Events.CHILD_REMOVED, removedSpy);
+         observableArray([child2, child1]);
+         expect(addedSpy.called).to.be.false();
+         expect(removedSpy.called).to.be.false();
+      });
+   });
+
    describe('addListener', function() {
 
       it('should add the listener for the given event', function() {

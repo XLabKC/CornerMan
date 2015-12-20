@@ -31,6 +31,7 @@
       UNBOUND_FROM_ELEMENT: 'self-unbound-from-element'
    };
 
+   /** Generates a key. */
    ViewModel.generateKey = function(length, availableCharacters) {
       var args = assertArgs(arguments, optional(Number), optional(String));
       length = args[0] || RANDOM_KEY_LENGTH;
@@ -42,14 +43,75 @@
       return keySegments.join('');
    };
 
-   ViewModel.prototype.addListener = function(eventType, callback) {
-      assertArgs(arguments, ofEnum(ViewModel.Events), Function);
-      if (!this.eventsToListeners_[eventType]) {
-         this.eventsToListeners_[eventType] = [];
-      }
-      this.eventsToListeners_[eventType].push(callback);
+   /**
+    * Creates an observable that can have a value of a view model or null. The value is set a child
+    * of the given view model, at the given key.
+    */
+   ViewModel.createChildObservable = function(viewModel, key, initialValue) {
+      assertArgs(arguments, ViewModel, String, optional(ViewModel));
+      key = key || ViewModel.generateKey();
+      var observable = ko.pureComputed({
+         read: function() {
+            return viewModel.getChildrenForKey(key)[0] || null;
+         },
+         write: function(child) {
+            assertArgs(arguments, optional(ViewModel));
+            if (viewModel.getChildrenForKey(key)[0] !== child) {
+               viewModel.replaceChildrenAtKey(key, child ? [child] : []);
+            }
+         },
+         owner: viewModel
+      });
+      observable.key_ = key;
+      observable.viewModel_ = viewModel;
+      observable['getKey'] = function() { return observable.key_; };
+      observable['getViewModel'] = function() { return observable.viewModel_; };
+      observable(initialValue);
+      return observable;
    };
 
+   /**
+    * Creates an observable that can have a value of an array of view models. The values
+    * (view models) are set as children of the given view model, at the given key.
+    */
+   ViewModel.createChildrenObservable = function(viewModel, key, initialValue) {
+      assertArgs(arguments, ViewModel, String, optional(arrayOf(ViewModel)));
+      var observable = ko.observableArray(initialValue);
+      observable.subscribe(
+            handleChildrenObservableChanged.bind(viewModel, viewModel, key), null, 'arrayChange');
+      observable.key_ = key;
+      observable.viewModel_ = viewModel;
+      observable['getKey'] = function() { return observable.key_; }
+      observable['getViewModel'] = function() { return observable.viewModel_; }
+      return observable;
+   };
+
+   /** Shortcut for {@code ViewModel.createChildObservable}. */
+   ViewModel.prototype.childObservable = function(initialValue, options) {
+      options = options || {};
+      var key = options['key'] || ViewModel.generateKey();
+      var viewModel = options['viewModel'] || this;
+      return ViewModel.createChildObservable(viewModel, key, initialValue);
+   }
+
+   /** Shortcut for {@code ViewModel.createChildrenObservable}. */
+   ViewModel.prototype.childrenObservable = function(initialValue, options) {
+      options = options || {};
+      var key = options['key'] || ViewModel.generateKey();
+      var viewModel = options['viewModel'] || this;
+      return ViewModel.createChildrenObservable(viewModel, key, initialValue);
+   }
+
+   /** Adds a listener for the given event. */
+   ViewModel.prototype.addListener = function(event, callback) {
+      assertArgs(arguments, ofEnum(ViewModel.Events), Function);
+      if (!this.eventsToListeners_[event]) {
+         this.eventsToListeners_[event] = [];
+      }
+      this.eventsToListeners_[event].push(callback);
+   };
+
+   /** Removes the listener. */
    ViewModel.prototype.removeListener = function(listener) {
       assertArgs(arguments, Function);
       var found = false;
@@ -66,35 +128,43 @@
       return found;
    }
 
+   /** Returns the parent for this view model or null. */
    ViewModel.prototype.getParent = function() {
       return this.parent_();
    };
 
+   /** Returns the template for this view model or null. */
    ViewModel.prototype.getTemplate = function() {
       return this.template_();
    };
 
+   /** Returns the keys for this view model or an empty array. */
    ViewModel.prototype.getKeys = function() {
       return this.keys_();
    };
 
+   /** Returns the observable containing the keys for this view model. */
    ViewModel.prototype.getKeysObservable = function() {
       return this.keys_;
    };
 
+   /** Returns all of the children view models for this view model. */
    ViewModel.prototype.getChildren = function() {
       return this.childrenObservable_();
    };
 
+   /** Returns an observable containing all of the children view models for this view model. */
    ViewModel.prototype.getChildrenObservable = function() {
       return this.childrenObservable_;
    };
 
+   /** Returns the children of this view model for the given key. */
    ViewModel.prototype.getChildrenForKey = function(key) {
       assertArgs(arguments, String);
       return this.getChildrenObservableForKey(key)();
    };
 
+   /** Returns an observable containing the children of this view model for the given key. */
    ViewModel.prototype.getChildrenObservableForKey = function(key) {
       assertArgs(arguments, String);
       if (!this.keysToChildrenObservables_[key]) {
@@ -104,6 +174,7 @@
       return this.keysToChildrenObservables_[key];
    };
 
+   /** Returns the key for the given child view model or null. */
    ViewModel.prototype.getKeyForChild = function(viewModel) {
       assertArgs(arguments, ViewModel);
       var keys = this.keys_();
@@ -119,6 +190,7 @@
       return null;
    };
 
+   /** Adds the given view model as a child of this view model at the given key. */
    ViewModel.prototype.addChildAtKey = function(key, viewModel) {
       assertArgs(arguments, String, ViewModel);
       var currentParent = viewModel.getParent();
@@ -170,6 +242,7 @@
       return true;
    };
 
+   /** Adds the given view models as children of this view model at the given key. */
    ViewModel.prototype.addChildrenAtKey = function(key, viewModels) {
       assertArgs(arguments, String, arrayOf(ViewModel));
       for (var i = 0, len = viewModels.length; i < len; i++) {
@@ -177,6 +250,9 @@
       };
    };
 
+   /**
+    * Adds the given view model as a child of this view model at a random key and returns the key.
+    */
    ViewModel.prototype.addChild = function(viewModel) {
       assertArgs(arguments, ViewModel);
       var key = ViewModel.generateKey();
@@ -184,6 +260,9 @@
       return key;
    };
 
+   /**
+    * Adds the given view models as children of this view model at a random key and returns the key.
+    */
    ViewModel.prototype.addChildren = function(viewModel) {
       assertArgs(arguments, arrayOf(ViewModel));
       var key = ViewModel.generateKey();
@@ -191,6 +270,10 @@
       return key;
    };
 
+   /**
+    * Attempts to remove the child view model at the given key and returns whether or not it was
+    * successful.
+    */
    ViewModel.prototype.removeChildAtKey = function(key, viewModel) {
       assertArgs(arguments, String, ViewModel);
       var wasRemoved = this.removeChildAtKeySilently_(key, viewModel, true /* storeRemovedChild */);
@@ -200,6 +283,10 @@
       return wasRemoved;
    };
 
+   /**
+    * Attempts to remove the child view model at the given key and returns whether or not it was
+    * successful.
+    */
    ViewModel.prototype.removeChild = function(viewModel) {
       assertArgs(arguments, ViewModel);
       var key = this.getKeyForChild(viewModel);
@@ -209,6 +296,10 @@
       return false;
    };
 
+   /**
+    * Removes any existing children at the given key and adds the given view models as children of
+    * this view model.
+    */
    ViewModel.prototype.replaceChildrenAtKey = function(key, viewModels) {
       assertArgs(arguments, String, arrayOf(ViewModel));
       var children = this.getChildrenForKey(key);
@@ -287,6 +378,32 @@
    ViewModel.prototype.unboundFromElement_ = function(element) {
       assertArgs(arguments, Element);
       this.dispatchEvent_(ViewModel.Events.UNBOUND_FROM_ELEMENT, element);
+   };
+
+   var handleChildrenObservableChanged = function(viewModel, key, changes) {
+      var childrenToStatues = {};
+      // Determine the change status of each child, ignore any moves.
+      for (var i = 0, len = changes.length; i < len; i++) {
+         var change = changes[i];
+         var skip = false;
+         // Check if there is a complementary action and skip if there is.
+         for (var j = 0, jLen = changes.length; j < jLen; j++) {
+            var other = changes[j];
+            if ((other.status === 'added' && change.status === 'deleted') ||
+                  (other.status === 'deleted' && change.status === 'added')) {
+               skip = true;
+               break;
+            }
+         }
+         if (skip) {
+            continue;
+         }
+         if (change.status === 'added') {
+            viewModel.addChildAtKey(key, change.value);
+         } else if (change.status === 'deleted') {
+            viewModel.removeChildAtKey(key, change.value);
+         }
+      }
    };
 
    cmDefine('viewmodels.ViewModel', ViewModel);

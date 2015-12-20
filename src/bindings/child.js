@@ -69,7 +69,7 @@
       return createValueAccessorFn({
          'name': child.template,
          'data': child,
-         'templateEngine': jstTemplateEngine,
+         // 'templateEngine': jstTemplateEngine,
          'if': ifCondition   
       });
    };
