@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "examples": "node examples/examples.runner.js"
   },
   "keywords": [
     "knockout",

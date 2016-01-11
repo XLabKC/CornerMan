@@ -2,7 +2,7 @@
 //= require view-models/view-model.js
 
 (function () {
-   var ViewModel = cmRequire('viewmodels.ViewModel')
+   var ViewModel = cmRequire('viewmodels.ViewModel');
 
    function ControlViewModel(template, order) {
       // TODO(blakevanlan): fix insist here, it breaks for some unknown reason.

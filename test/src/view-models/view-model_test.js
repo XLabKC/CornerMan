@@ -506,6 +506,7 @@ describe('viewmodels.ViewModel', function() {
       });
    });
 
+   // Possibly remove from framework. Somewhat against the design of MVVM.
    describe.skip('bound/unbound', function() {
 
       function FooViewModel(child) {

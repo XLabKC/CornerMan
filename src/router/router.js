@@ -21,8 +21,8 @@
    Router.prototype.get = function(/* route [, callbacks...] */) {
       var route = arguments[0];
       var callbacks = Array.prototype.slice.call(arguments, 1);
-      assertOfType(route, String)
-      assertOfType(callbacks, arrayOf(Function))
+      assertOfType(route, String);
+      assertOfType(callbacks, arrayOf(Function));
       this.routes_.push(new Route(route, callbacks));
    };
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <script type="text/javascript" src="/common/insist.js"></script>
+   <script type="text/javascript" src="/common/jquery.js"></script>
+   <script type="text/javascript" src="/common/knockout.js"></script>
+   <script type="text/javascript" src="/export.js"></script>
+   <script type="text/javascript" src="boxes.js"></script>
+   <link rel="stylesheet" type="text/css" href="boxes.css">
+</head>
+<body>
+<script type="text/html" id="base-template">
+   <header>
+      <h1>Corner Man</h1>
+      <!--<div class="controls" data-bind="foreach: addChildButtons">
+         <div class="add-child-button" data-bind="child: $data, style: {background: rgbaColor}"></div>
+      </div>-->
+      <a data-bind="click: addChild">Add Child</a>
+   </header>
+   <div class="boxes-container" data-bind="foreach: boxChildren">
+      <div class="box" data-bind="child: $data, style: {background: rgbaColor}, click: addChild, clickBubble: false"></div>
+   </div>
+</script>
+<script type="text/html" id="box-template">
+   <!-- ko foreach: boxChildren -->
+      <div class="box" data-bind="child: $data, style: {background: rgbaColor}, click: addChild, clickBubble: false"></div>
+   <!-- /ko -->
+</script>
+<script type="text/html" id="add-child-button-template">
+   <a data-bind="click: onClick"></a>
+</script>
+
+<div class="content" data-bind="text: name"></div>
+</body>
+
+</html>

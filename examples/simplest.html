@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script type="text/html" id="hello-template">
+   <h1>Hello there, <span data-bind="child: nameProvider"></span>!</h1>
+</script>
+<script type="text/html" id="name-template">
+   <span data-bind="text: name"></span>
+</script>
+</body>
+<script type="text/javascript" src="knockout.js"></script>
+<script type="text/javascript" src="cornerman.js"></script>
+<script type="text/javascript">
+   function HelloVM() {
+      CornerMan.ViewModel.call(this, 'hello-template');
+      this.nameProvider = this.createChildObservable();
+   }
+   cm.inherit(HelloVM, cm.ViewModel);
+   
+   function NameVM() {
+      ViewModel.call(this, 'name-template');
+      this.name = ko.observable('World');
+   }
+   cm.inherit(NameVM, cm.ViewModel);
+
+
+   var helloVM = new HelloVM();
+   var nameVM = new NameVM();
+   helloVM.nameProvider(nameVM);
+
+   var app = cm.create();
+   app.setRootViewModel();
+   app.bindRootViewModel(helloVM);
+</script>
+</html>

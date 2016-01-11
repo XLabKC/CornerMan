@@ -1,6 +1,13 @@
 (function(scope) {
    var root = {};
 
+   scope.CornerMan = {};
+
+   scope.cmInherit = function(subClass, superClass) {
+      subClass.prototype = Object.create(superClass.prototype);
+      subClass.prototype.constructor = subClass;
+   };
+
    scope.cmDefine = function(namespace, obj) {
       var namespace = namespace.replace(/\./g, '$');
       if (root[namespace]) {

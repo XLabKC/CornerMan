@@ -1,0 +1,27 @@
+.box {
+   position: relative;
+   float: left;
+   min-height: 40px;
+   min-width: 40px;
+   /*background-color: rgba(100, 25, 25, 0.6);*/
+   margin: 8px;
+   border-radius: 4px;
+   border: 1px solid rgba(100, 25, 25, 0.8);
+}
+.box::after {
+   height: 0px;
+   clear: both;
+}
+
+.add-child-button {
+   height: 10px;
+   width: 10px;
+   background-color: black;
+}
+
+.add-child-button a {
+   display: block;
+   height: 10px;
+   width: 10px;
+   background-color: black;
+}
