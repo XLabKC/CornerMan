@@ -43,7 +43,7 @@
          if (value instanceof ViewModel) {
             // A view model is being supplied as the value.
             child = value;
-         } else if (insist.isOfType(arrayOf(ViewModel))) {
+         } else if (insist.isOfType(value, arrayOf(ViewModel))) {
             // An array of view models is being supplied. Take the first child if asChildren option
             // is false.
             if (asChildren) {
@@ -63,7 +63,7 @@
          // If the view model is not being supplied as a value, the view model parent must be
          // supplied.
          assertOfType(viewModel, ViewModel);
-         if (insist.isOfType(String)) {
+         if (insist.isOfType(value, String)) {
             // A key to the child was provided as the value, use the parent view model to fetch the
             // actual child.
             captureChildOrChildren(viewModel.getChildrenForKey(value));

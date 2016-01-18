@@ -7,10 +7,12 @@ describe('bindings.Child', function() {
    var Child = cmRequire('bindings.Child');
    var ViewModel = cmRequire('viewmodels.ViewModel');
 
+   var TextTemplate = '<script type="text/html" id="text-template">Hello World</script>'
+
    function ViewModelWithChildProperty(child) {
       assertArgs(arguments, ViewModel);
       ViewModel.call(this);
-      this.child = this.childObservable(child);
+      this.child = this.childObservable(child, {key: 'key'});
    };
    cmInherit(ViewModelWithChildProperty, ViewModel);
 
@@ -19,11 +21,29 @@ describe('bindings.Child', function() {
    });
 
    describe('child', function() {
-      it('should bind a supplied view model', function() {
-         var template = 
-         var element = $('<div data-bind="child: child"></div>')[0];
-         var child = new ViewModel();
+      
+      it('should bind a supplied view model', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="child: child"></div>');
+         var child = new ViewModel('text-template');
          var vm = new ViewModelWithChildProperty(child);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('Hello World');
+            done();
+         }, 0);
+      });
+
+      it('should bind the view model at a supplied key', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="child: \'key\'"></div>');
+         var child = new ViewModel('text-template');
+         var vm = new ViewModelWithChildProperty(child);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('Hello World');
+            done();
+         }, 0);
       });
    });
 
