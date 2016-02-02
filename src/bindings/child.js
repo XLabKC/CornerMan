@@ -13,7 +13,7 @@
    };
 
    var createTemplateAccessorFnForChildren = function(children, ifCondition) {
-      assertArgs(arguments, arrayOf(ViewModel), nullable(Function));
+      assertArgs(arguments, arrayOf(ViewModel), [nullable(Function), Boolean]);
       var templateFn = function(child) {
          return child.getTemplate();
       }
@@ -68,7 +68,7 @@
             // actual child.
             captureChildOrChildren(viewModel.getChildrenForKey(value));
          } else {
-            assertOfType(value, [String, ViewModel, arrayOf(ViewModel)]);
+            assertOfType(value, Object);
             var childrenArray = insist.isOfType(value['data'], String) ?
                   viewModel.getChildrenForKey(value['data']) :
                   value['data'];

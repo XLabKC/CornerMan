@@ -76,13 +76,14 @@
     */
    ViewModel.createChildrenObservable = function(viewModel, key, initialValue) {
       assertArgs(arguments, ViewModel, String, optional(arrayOf(ViewModel)));
-      var observable = ko.observableArray(initialValue);
+      var observable = ko.observableArray();
       observable.subscribe(
             handleChildrenObservableChanged.bind(viewModel, viewModel, key), null, 'arrayChange');
       observable.key_ = key;
       observable.viewModel_ = viewModel;
-      observable['getKey'] = function() { return observable.key_; }
-      observable['getViewModel'] = function() { return observable.viewModel_; }
+      observable['getKey'] = function() { return observable.key_; };
+      observable['getViewModel'] = function() { return observable.viewModel_; };
+      observable(initialValue);
       return observable;
    };
 

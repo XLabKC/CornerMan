@@ -16,6 +16,13 @@ describe('bindings.Child', function() {
    };
    cmInherit(ViewModelWithChildProperty, ViewModel);
 
+   function ViewModelWithChildrenProperty(children) {
+      assertArgs(arguments, arrayOf(ViewModel));
+      ViewModel.call(this);
+      this.children = this.childrenObservable(children, {key: 'key'});
+   };
+   cmInherit(ViewModelWithChildrenProperty, ViewModel);
+
    before(function() {
       Child.attachToKnockout();
    });
@@ -42,6 +49,73 @@ describe('bindings.Child', function() {
          ko.applyBindings(vm, $element[0]);
          setTimeout(function() {
             expect($element.html()).to.equal('Hello World');
+            done();
+         }, 0);
+      });
+
+      it('should bind the first child in a supplied array', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="child: children"></div>');
+         var child1 = new ViewModel('text-template');
+         var child2 = new ViewModel('text-template');
+         var vm = new ViewModelWithChildrenProperty([child1, child2]);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('Hello World');
+            done();
+         }, 0);
+      });
+
+      it('should pass the ifCondition when supplied', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="child:{data: child, ifCondition: false}"></div>');
+         var child = new ViewModel('text-template');
+         var vm = new ViewModelWithChildProperty(child);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('');
+            done();
+         }, 0);
+      });
+   });
+
+   describe('children', function() {
+      
+      it('should bind supplied view models', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="children: children"></div>');
+         var child1 = new ViewModel('text-template');
+         var child2 = new ViewModel('text-template');
+         var vm = new ViewModelWithChildrenProperty([child1, child2]);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('Hello WorldHello World');
+            done();
+         }, 0);
+      });
+
+      it('should bind the view model at a supplied key', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="children: \'key\'"></div>');
+         var child1 = new ViewModel('text-template');
+         var child2 = new ViewModel('text-template');
+         var vm = new ViewModelWithChildrenProperty([child1, child2]);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('Hello WorldHello World');
+            done();
+         }, 0);
+      });
+
+      it('should pass the ifCondition when supplied', function(done) {
+         var $template = $(TextTemplate).appendTo('body');
+         var $element = $('<div data-bind="children:{data: children, ifCondition: false}"></div>');
+         var child1 = new ViewModel('text-template');
+         var child2 = new ViewModel('text-template');
+         var vm = new ViewModelWithChildrenProperty([child1, child2]);
+         ko.applyBindings(vm, $element[0]);
+         setTimeout(function() {
+            expect($element.html()).to.equal('');
             done();
          }, 0);
       });
