@@ -3,7 +3,7 @@
 
 describe('router.Route', function() { 
 
-   var Route = cmRequire('router.Route');
+   var Route = cm.require('router.Route');
       
    it('should pass the slug values all the way through to the callbacks', function() {
       var callback = sinon.spy();

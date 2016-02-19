@@ -5,15 +5,15 @@
 //= require view-models/view-model.js
 
 (function(scope) {
-   var ViewModel = cmRequire('viewmodels.ViewModel');
-   var CornerMan = cmRequire('CornerMan');
+   var ViewModel = cm.require('viewmodels.ViewModel');
+   var CornerMan = cm.require('CornerMan');
 
    // Export classes.
    scope.CornerMan = {
       'CornerMan': CornerMan,
-      'Router': cmRequire('router.Router'),
-      'ContentViewModel': cmRequire('viewmodels.ContentViewModel'),
-      'ControlViewModel': cmRequire('viewmodels.ControlViewModel'),
+      'Router': cm.require('router.Router'),
+      'ContentViewModel': cm.require('viewmodels.ContentViewModel'),
+      'ControlViewModel': cm.require('viewmodels.ControlViewModel'),
       'ViewModel': ViewModel,
       'Events': ViewModel.Events
    };
@@ -24,5 +24,5 @@
    scope.CornerMan['create'] = function(rootViewModel) {
       return new CornerMan(rootViewModel);
    };
-   scope.CornerMan['inherit'] = scope.cmInherit;
+   scope.CornerMan['inherit'] = cm.inherit;
 })(this);

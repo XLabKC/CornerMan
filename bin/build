@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var coffee = require('coffee-script');
+var fs = require('fs');
+var http = require('http');
+var Mincer = require('mincer');
+var path = require('path');
+var url = require('url');
+var config = require('../package.json')
+var UglifyJS = require("uglify-js2")
+
+/** Create mincer environment. */
+var environment = new Mincer.Environment();
+environment.appendPath(path.join(__dirname, '../src'));
+
+var asset = environment.findAsset(path.join(__dirname, '../src/export.js'));
+var filename = 'corner-man-' + config.version + '.js';
+var filePath = path.join(__dirname, '../out', filename);
+
+var source = asset.toString();
+source = wrapInFunction(source);
+source = uglify(source, false);
+
+fs.writeFileSync(filePath, source, 'utf8');
+
+function wrapInFunction(source) {
+   return '(function() {\n' + source + '\n})();';
+}
+
+function uglify(source, includeTypeAsserts) {
+   var ast = UglifyJS.parse(source);
+   ast.figure_out_scope();
+   var compressor = UglifyJS.Compressor({
+      global_defs: {
+         CORNER_MAN_ASSERT_TYPES: includeTypeAsserts
+      }
+   });
+   ast = ast.transform(compressor);
+   return ast.print_to_string(); 
+}

@@ -6,31 +6,30 @@
 //= require view-models/view-model.js
 
 (function() {
-   var ViewModel = cmRequire('viewmodels.ViewModel');
-   var Router = cmRequire('router.Router');
-   var ChildBinding = cmRequire('bindings.Child');
+   var ViewModel = cm.require('viewmodels.ViewModel');
+   var Router = cm.require('router.Router');
+   var ChildBinding = cm.require('bindings.Child');
 
    function CornerMan(rootViewModel) {
-      assertArgs(arguments, ViewModel);
+      if (CM_ASSERT_TYPES) if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ViewModel);
       this.router = new Router();
       this.rootViewModel_ = ko.observable(rootViewModel);
    }
 
-   CornerMan.prototype.getRootViewModel = function(rootViewModel) {
-      assertArgs(arguments, ViewModel);
+   CornerMan.prototype.getRootViewModel = function() {
       return this.rootViewModel_();
    }
    
    CornerMan.prototype.setRootViewModel = function(rootViewModel) {
-      assertArgs(arguments, ViewModel);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ViewModel);
       this.rootViewModel_(rootViewModel);
    }
 
    CornerMan.prototype.get = function(/* route [, callbacks...] */) {
       var route = arguments[0];
       var callbacks = Array.prototype.slice.call(arguments, 1);
-      assertOfType(route, String);
-      assertOfType(callbacks, arrayOf(Function));
+      if (CM_ASSERT_TYPES) cm.assertOfType(route, String);
+      if (CM_ASSERT_TYPES) cm.assertOfType(callbacks, cm.arrayOf(Function));
 
       // Bind each callback to this.
       for (var i = 0, len = callbacks.length; i < len; i++) {
@@ -47,12 +46,12 @@
    };
 
    CornerMan.prototype.bindRootViewModel = function(element) {
-      assertArgs(arguments, optional(Node));
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(Node));
       ChildBinding.attachToKnockout();
       element = element || document.body;
       element.setAttribute('data-bind', 'child: rootViewModel_');
       ko.applyBindings(this);
    };
 
-   cmDefine('CornerMan', CornerMan);
+   cm.define('CornerMan', CornerMan);
 })(this);

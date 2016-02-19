@@ -4,24 +4,24 @@
 
 describe('bindings.Child', function() {
    
-   var Child = cmRequire('bindings.Child');
-   var ViewModel = cmRequire('viewmodels.ViewModel');
+   var Child = cm.require('bindings.Child');
+   var ViewModel = cm.require('viewmodels.ViewModel');
 
    var TextTemplate = '<script type="text/html" id="text-template">Hello World</script>'
 
    function ViewModelWithChildProperty(child) {
-      assertArgs(arguments, ViewModel);
+      cm.assertArgs(arguments, ViewModel);
       ViewModel.call(this);
       this.child = this.childObservable(child, {key: 'key'});
    };
-   cmInherit(ViewModelWithChildProperty, ViewModel);
+   cm.inherit(ViewModelWithChildProperty, ViewModel);
 
    function ViewModelWithChildrenProperty(children) {
-      assertArgs(arguments, arrayOf(ViewModel));
+      cm.assertArgs(arguments, cm.arrayOf(ViewModel));
       ViewModel.call(this);
       this.children = this.childrenObservable(children, {key: 'key'});
    };
-   cmInherit(ViewModelWithChildrenProperty, ViewModel);
+   cm.inherit(ViewModelWithChildrenProperty, ViewModel);
 
    before(function() {
       Child.attachToKnockout();

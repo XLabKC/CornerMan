@@ -1,41 +1,42 @@
 (function(scope) {
    var root = {};
-
-   scope.CornerMan = {};
-
-   scope.cmInherit = function(subClass, superClass) {
-      subClass.prototype = Object.create(superClass.prototype);
-      subClass.prototype.constructor = subClass;
-   };
-
-   scope.cmDefine = function(namespace, obj) {
-      var namespace = namespace.replace(/\./g, '$');
-      if (root[namespace]) {
-         throw Error('Namespace already exists: ' + namespace);
+   scope.cm = {
+      inherit: function(subClass, superClass) {
+         subClass.prototype = Object.create(superClass.prototype);
+         subClass.prototype.constructor = subClass;
+      },
+      define: function(namespace, obj) {
+         var namespace = namespace.replace(/\./g, '$');
+         if (root[namespace]) {
+            throw Error('Namespace already exists: ' + namespace);
+         }
+         root[namespace] = obj;
+      },
+      require: function(namespace) {
+         var namespace = namespace.replace(/\./g, '$');
+         if (!root[namespace]) {
+            throw Error('Unknown namespace: ' + namespace); 
+         }
+         return root[namespace];
       }
-      root[namespace] = obj;
    };
 
-   scope.cmRequire = function(namespace) {
-      var namespace = namespace.replace(/\./g, '$');
-      if (!root[namespace]) {
-         throw Error('Unknown namespace: ' + namespace); 
-      }
-      return root[namespace];
-   };
-
-   scope.assertArgs = insist.args;
-   scope.assertOfType = insist.ofType;
-   scope.assertType = insist.isType;
-   scope.isValidType = insist.isValidType;
-   scope.isOptionalType = insist.isOptionalType;
-   scope.getNameForValue = insist.getNameForValue;
-   scope.getNameForType = insist.getNameForType;
-   scope.isOfType = insist.isOfType;
-   scope.arrayOf = insist.arrayOf;
-   scope.nullable = insist.nullable;
-   scope.anything = insist.anything;
-   scope.optional = insist.optional;
-   scope.ofEnum = insist['enum'];
+   if (typeof CM_ASSERT_TYPES === 'undefined') {
+      CM_ASSERT_TYPES = true;
+   }
+   if (CM_ASSERT_TYPES) {
+      var noop = function() {};
+      var insist = scope.insist || {};
+      scope.cm.assertArgs = scope.assertArgs || insist.args || noop;
+      scope.cm.assertOfType = scope.assertOfType || insist.ofType || noop;
+      scope.cm.assertType = scope.assertType || insist.isType || noop;
+      scope.cm.getNameForValue = scope.getNameForValue || insist.getNameForValue || noop;
+      scope.cm.getNameForType = scope.getNameForType || insist.getNameForType || noop;
+      scope.cm.arrayOf = scope.arrayOf || insist.arrayOf || noop;
+      scope.cm.nullable = scope.nullable || insist.nullable || noop;
+      scope.cm.anything = scope.anything || insist.anything || noop;
+      scope.cm.optional = scope.optional || insist.optional || noop;
+      scope.cm.ofEnum = scope.ofEnum || insist['enum'] || noop;
+   }
 
 })(this);

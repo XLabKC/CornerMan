@@ -4,37 +4,38 @@
 
 (function() {
 
-   var Route = cmRequire('router.Route');
+   var Route = cm.require('router.Route');
 
    function Router(on404) {
-      assertArgs(arguments, insist.optional(Function));
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(Function));
       this.on404_ = on404 || (function(url) { console.log('404 at', url); });
       this.routes_ = [];
       this.historyLength_ = 0;
    }
 
    Router.prototype.setOn404 = function(on404) {
-      assertArgs(arguments, Function);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, Function);
       this.on404_ = on404;
    };
 
    Router.prototype.get = function(/* route [, callbacks...] */) {
       var route = arguments[0];
       var callbacks = Array.prototype.slice.call(arguments, 1);
-      assertOfType(route, String);
-      assertOfType(callbacks, arrayOf(Function));
+      if (CM_ASSERT_TYPES) cm.assertOfType(route, String);
+      if (CM_ASSERT_TYPES) cm.assertOfType(callbacks, cm.arrayOf(Function));
       this.routes_.push(new Route(route, callbacks));
    };
 
    // Starts the router listening. The initial URL is passed through the router immediately.
    Router.prototype.listen = function() {
-      window.addEventListener('popstate', (function (e) {
+      window.addEventListener('popstate', (function () {
          this.historyLength_ -= 1;
          this.notify_(this.currentUrlWithoutOrigin_());
       }).bind(this));
 
       // Capture all clicks on links. Have to use self because 'this' is the element clicked.
       var self = this;
+      // TODO: determine how to achieve this behavior without jquery.
       $(document).on('click', '[href]', function(e) {
          href = this.getAttribute('href');
          // Let external links behave normally.
@@ -49,7 +50,7 @@
 
    // Navigates to the supplied URL.
    Router.prototype.navigate = function(url) {
-      assertArgs(arguments, String)
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String)
       if (this.addOriginIfNeeded_(url) == window.location.href) {
          return;
       }
@@ -72,7 +73,7 @@
       
    // Calls the proper callbacks based on the supplied URL.
    Router.prototype.notify_ = function(url) {
-      assertArgs(arguments, String)
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String)
       for (var i = 0, len = this.routes_.length; i < len; i++) {
          if (this.routes_[i].attemptToHandleUrl(url)) {
             return;
@@ -101,6 +102,6 @@
    };
 
    
-   cmDefine('router.Router', Router);
+   cm.define('router.Router', Router);
 })();
 

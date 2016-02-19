@@ -18,5 +18,5 @@
       return this.template_;
    };
 
-   cmDefine('templates.Template', Template);
+   cm.define('templates.Template', Template);
 })();

@@ -4,8 +4,8 @@
 
 describe('viewmodels.ContentViewModel', function() {
 
-   var ContentViewModel = cmRequire('viewmodels.ContentViewModel');
-   var ControlViewModel = cmRequire('viewmodels.ControlViewModel');
+   var ContentViewModel = cm.require('viewmodels.ContentViewModel');
+   var ControlViewModel = cm.require('viewmodels.ControlViewModel');
 
    describe('constructor', function() {
 

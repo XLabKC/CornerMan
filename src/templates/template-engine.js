@@ -2,7 +2,7 @@
 //= require templates/template.js
 
 (function () {
-   var Template = cmRequire('templates.Template');
+   var Template = cm.require('templates.Template');
 
 
    function TemplateEngine() {
@@ -14,5 +14,5 @@
       return new Template(template);
    };
 
-   cmDefine('viewmodels.ControlViewModel', ControlViewModel);
+   cm.define('viewmodels.ControlViewModel', ControlViewModel);
 })();

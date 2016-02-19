@@ -2,11 +2,9 @@
 //= require view-models/view-model.js
 
 (function () {
-   var ViewModel = cmRequire('viewmodels.ViewModel');
+   var ViewModel = cm.require('viewmodels.ViewModel');
 
    function ControlViewModel(template, order) {
-      // TODO(blakevanlan): fix insist here, it breaks for some unknown reason.
-      // var args = assertArgs(arguments, optional(String), Number);
       if ((typeof template) === 'number') {
          order = arguments[0];
          template = '';
@@ -14,8 +12,7 @@
       ViewModel.call(this, template);
       this.order_ = ko.observable(order);
    };
-   ControlViewModel.prototype = Object.create(ViewModel.prototype);
-   ControlViewModel.prototype.constructor = ControlViewModel;
+   cm.inherit(ControlViewModel, ViewModel);
 
    ControlViewModel.prototype.getOrder = function() {
       return this.order_();
@@ -25,5 +22,5 @@
       return this.order_(order);
    }
 
-   cmDefine('viewmodels.ControlViewModel', ControlViewModel);
+   cm.define('viewmodels.ControlViewModel', ControlViewModel);
 })();

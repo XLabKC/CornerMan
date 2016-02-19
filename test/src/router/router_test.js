@@ -4,8 +4,8 @@
 
 describe('router.Router', function() {
 
-   var Router = cmRequire('router.Router');
-   var Route = cmRequire('router.Route');
+   var Router = cm.require('router.Router');
+   var Route = cm.require('router.Route');
       
    beforeEach(function() {
       this.router = new Router();

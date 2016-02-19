@@ -3,40 +3,39 @@
 //= require view-models/control-view-model.js
 
 (function() {
-   var ViewModel = cmRequire('viewmodels.ViewModel');
-   var ControlViewModel = cmRequire('viewmodels.ControlViewModel');
+   var ViewModel = cm.require('viewmodels.ViewModel');
+   var ControlViewModel = cm.require('viewmodels.ControlViewModel');
    var CONTROL_KEY_PREFIX = 'control_key:';
 
    function ContentViewModel(template) {
-      assertArgs(arguments, optional(String));
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(String));
       ViewModel.call(this, template);
       this.keysToControlsObservables_ = {};
    };
-   ContentViewModel.prototype = Object.create(ViewModel.prototype);
-   ContentViewModel.prototype.constructor = ContentViewModel;
+   cm.inherit(ContentViewModel, ViewModel);
 
    ContentViewModel.prototype.getControlsForKey = function(key) {
-      assertArgs(arguments, String);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String);
       return this.getControlsObservableForKey(key)();
    };
 
    ContentViewModel.prototype.getControlsObservableForKey = function(key) {
-      assertArgs(arguments, String);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String);
       return this.getControlsObservableForKeyInternal_(CONTROL_KEY_PREFIX + key);
    };
 
    ContentViewModel.prototype.addControlAtKey = function(key, control) {
-      assertArgs(arguments, String, ControlViewModel);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, ControlViewModel);
       this.addChildAtKey(CONTROL_KEY_PREFIX + key, control);
    };
 
    ContentViewModel.prototype.removeControlAtKey = function(key, control) {
-      assertArgs(arguments, String, ControlViewModel);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, ControlViewModel);
       return this.removeChildAtKey(CONTROL_KEY_PREFIX + key, control);
    };
 
    ContentViewModel.prototype.getControlsObservableForKeyInternal_ = function(controlKey) {
-      assertArgs(arguments, String);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String);
       if (!this.keysToControlsObservables_[controlKey]) {
          this.keysToControlsObservables_[controlKey] =
                ko.pureComputed(this.computeControls_.bind(this, controlKey));
@@ -66,7 +65,7 @@
    };
 
    var controlComparator = function (a, b) {
-      assertArgs(arguments, ControlViewModel, ControlViewModel);
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ControlViewModel, ControlViewModel);
       var orderA = a.getOrder();
       var orderB = b.getOrder();
       if (orderA < orderB) return -1;
@@ -74,5 +73,5 @@
       return 1;
    };
 
-   cmDefine('viewmodels.ContentViewModel', ContentViewModel);
+   cm.define('viewmodels.ContentViewModel', ContentViewModel);
 })();
