@@ -1,3 +1,7 @@
+/*!
+ * CornerMan JavaScript library v1.0.0
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+ */
 (function() {
    (function(scope) {
       var root = {};

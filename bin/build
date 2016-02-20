@@ -29,12 +29,14 @@ function generateFullSource(asset, includeTypeAsserts) {
    // Remove require comments.
    source = source.replace(/\s*\/\/\s*\(=\)\srequire\s[\w/.-]+/g, '');
    source = source.replace(/\n\s*\n\n+/g, '');
+   source = prependCommentHeader(source);
    outputSource(source, includeTypeAsserts ? 'debug.asserts' : 'debug');
 }
 
 function generateMinifiedSource(source, includeTypeAsserts) {
    source = wrapInFunction(source);
    source = uglify(source, includeTypeAsserts);
+   source = prependCommentHeader(source);
    outputSource(source, includeTypeAsserts ? 'min.asserts' : 'min')
 }
 
@@ -96,6 +98,13 @@ function uglify(source, options) {
    ast.mangle_names();
 
    return ast.print_to_string();
+}
+
+function prependCommentHeader(source) {
+   return '/*!\n' +
+          ' * CornerMan JavaScript library v' + config.version + '\n' +
+          ' * License: MIT (http://www.opensource.org/licenses/mit-license.php)\n' +
+          ' */\n' + source;
 }
 
 function outputSource(source, fileNameAddition) {
