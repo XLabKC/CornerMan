@@ -111,7 +111,9 @@ viewModel.addListener(CornerMan.ViewModel.Events.REMOVED_FROM_PARENT,
 #### childObservation(initialValue, options)
 * `initialValue` _ViewModel_
 * `options` _Object_
-  * `key` _String_ (optional) the key to use for this observable
+  * `key` _String_ (optional): The key to use for this observable
+* `=>` _Observable_: Returns a Knockout observable
+  
 Creates an observable that contains a ViewModel. Any ViewModel set in the observable will be set as a child of this ViewModel.
 ```js
 function FooViewModel() {
@@ -124,7 +126,9 @@ CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
 #### childrenObservable(initialValue, options)
 * `initialValue` _ViewModel_
 * `options` _Object_
-  * `key` _String_ (optional) the key to use for this observable
+  * `key` _String_ (optional): The key to use for this observable
+* `=>` _Observable_: Returns a Knockout observable
+
 Creates an observable that contains an array of ViewModels. ViewModels added/removed from this observable be set as children of this observable. 
 ```js
 function FooViewModel() {
@@ -134,12 +138,47 @@ function FooViewModel() {
 CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
 ```
 
-### addListener(event, callback)
+#### addListener(event, callback)
 * `event` _ViewModel.Events_
-* `callback` _Function_ 
-* 
+* `callback` _Function_: Refer to _ViewModel.Events_ for callback parameters
+
+Adds a listener to the _ViewModel_.
   
-  
+#### removeListener(listener)
+* `listener` _Function_: The callback function passed to #addListener
+
+Removes the listener from the _ViewModel_.
+
+#### getParent()
+* `=>` _ViewModel_: Returns the parent of this _ViewModel_ or null.
+
+#### getTemplate()
+* `=>` _String_: Returns the template of this _ViewModel_ or null.
+
+#### getKeys()
+* `=>` _Array<String>_: Returns all of the child keys of this _ViewModel_.
+
+#### getKeysObservable()
+* `=>` _Observable<Array<String>>_: Returns an observable containing all of the child keys of this _ViewModel_.
+
+#### getChildren()
+* `=>` _Array<ViewModel>_: Returns all of the children of this _ViewModel_.
+
+#### getChildrenObservable()
+* `=>` _Observable<Array<ViewModel>>_: Returns an observable containing all of the children of this _ViewModel_.
+
+#### getChildrenForKey(key)
+* `key` _String_
+* `=>` _Array<ViewModel>_: Returns all of the children of this _ViewModel_ at the given key.
+
+#### getChildrenObservableForKey(key)
+* `key` _String_
+* `=>` _Observable<Array<ViewModel>>_: Returns an observable containing all of the children of this _ViewModel_ at the given key.
+
+#### getKeyForChild(viewModel)
+* `viewModel` _ViewModel_: Child of this _ViewModel_
+* `=>` _String_: The key of the given _ViewModel_ or null.
+
 
 ## ContentViewModel
 
