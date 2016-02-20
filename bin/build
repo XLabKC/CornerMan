@@ -1,41 +1,109 @@
 #!/usr/bin/env node
 
-var async = require('async');
 var coffee = require('coffee-script');
 var fs = require('fs');
-var http = require('http');
 var Mincer = require('mincer');
 var path = require('path');
-var url = require('url');
 var config = require('../package.json')
 var UglifyJS = require("uglify-js2")
 
 /** Create mincer environment. */
 var environment = new Mincer.Environment();
 environment.appendPath(path.join(__dirname, '../src'));
-
 var asset = environment.findAsset(path.join(__dirname, '../src/export.js'));
-var filename = 'corner-man-' + config.version + '.js';
-var filePath = path.join(__dirname, '../out', filename);
 
-var source = asset.toString();
-source = wrapInFunction(source);
-source = uglify(source, false);
+generateFullSource(asset, true);
+generateFullSource(asset, false);
+generateMinifiedSource(asset, true);
+generateMinifiedSource(asset, false);
 
-fs.writeFileSync(filePath, source, 'utf8');
-
-function wrapInFunction(source) {
-   return '(function() {\n' + source + '\n})();';
+/**
+ * Generators
+ */
+function generateFullSource(asset, includeTypeAsserts) {
+   source = wrapInFunction(asset.toString());
+   source = uglify(source, {
+      includeTypeAsserts: includeTypeAsserts,
+      beautify: true
+   });
+   // Remove require comments.
+   source = source.replace(/\s*\/\/\s*\(=\)\srequire\s[\w/.-]+/g, '');
+   source = source.replace(/\n\s*\n\n+/g, '');
+   outputSource(source, includeTypeAsserts ? 'debug.asserts' : 'debug');
 }
 
-function uglify(source, includeTypeAsserts) {
+function generateMinifiedSource(source, includeTypeAsserts) {
+   source = wrapInFunction(source);
+   source = uglify(source, includeTypeAsserts);
+   outputSource(source, includeTypeAsserts ? 'min.asserts' : 'min')
+}
+
+/**
+ * Helpers
+ */
+function wrapInFunction(source) {
+   return '(function() {\n' + source + '\n})();\n';
+}
+
+function uglify(source, options) {
+   options = options || {};
+   var includeTypeAsserts = options.includeTypeAsserts;
+   var beautify = options.beautify;
+
+   // Compress.
    var ast = UglifyJS.parse(source);
    ast.figure_out_scope();
-   var compressor = UglifyJS.Compressor({
-      global_defs: {
-         CORNER_MAN_ASSERT_TYPES: includeTypeAsserts
+   var compressorOptions = {
+      sequences     : !beautify,  // join consecutive statemets with the “comma operator”
+      properties    : !beautify,  // optimize property access: a["foo"] → a.foo
+      dead_code     : true,  // discard unreachable code
+      drop_debugger : true,  // discard “debugger” statements
+      unsafe        : !beautify,      // some unsafe optimizations (see below)
+      conditionals  : !(beautify && includeTypeAsserts),  // optimize if-s and conditional expressions
+      comparisons   : !beautify,  // optimize comparisons
+      evaluate      : !(beautify && includeTypeAsserts),  // evaluate constant expressions
+      booleans      : !beautify,  // optimize boolean expressions
+      loops         : !beautify,  // optimize loops
+      unused        : true,  // drop unused variables/functions
+      hoist_funs    : !beautify,  // hoist function declarations
+      hoist_vars    : !beautify,      // hoist variable declarations
+      if_return     : !beautify,  // optimize if-s followed by return/continue
+      join_vars     : !beautify,  // join var declarations
+      cascade       : !beautify,  // try to cascade `right` into `left` in sequences
+      side_effects  : !beautify  // drop side-effect-free statements
+   }
+   if (!includeTypeAsserts) {
+      compressorOptions.global_defs = {
+         CM_ASSERT_TYPES: false
       }
-   });
+   }
+   var compressor = UglifyJS.Compressor(compressorOptions);
    ast = ast.transform(compressor);
-   return ast.print_to_string(); 
+   
+   if (beautify) {
+      var stream = UglifyJS.OutputStream({
+         indent_level: 3,
+         beautify: true,
+         comments: true
+      });
+      ast.print(stream); 
+      return stream.toString();
+   }
+
+   // Mangle.
+   ast.figure_out_scope();
+   ast.compute_char_frequency();
+   ast.mangle_names();
+
+   return ast.print_to_string();
+}
+
+function outputSource(source, fileNameAddition) {
+   var fileNameAddition = fileNameAddition ? '.' + fileNameAddition : '';
+   var directory = path.join(__dirname, '../out', config.version);
+   var filename = 'corner-man-' + config.version + fileNameAddition + '.js';
+   var filePath = path.join(directory, filename);
+   // Create directory if it doesn't exist.
+   if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+   fs.writeFileSync(filePath, source, 'utf8');
 }

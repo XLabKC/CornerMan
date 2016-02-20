@@ -26,9 +26,8 @@
    }
 
    CornerMan.prototype.get = function(/* route [, callbacks...] */) {
-      var route = arguments[0];
       var callbacks = Array.prototype.slice.call(arguments, 1);
-      if (CM_ASSERT_TYPES) cm.assertOfType(route, String);
+      if (CM_ASSERT_TYPES) cm.assertOfType(arguments[0], String);
       if (CM_ASSERT_TYPES) cm.assertOfType(callbacks, cm.arrayOf(Function));
 
       // Bind each callback to this.
