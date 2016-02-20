@@ -26,9 +26,7 @@
       CHILD_REMOVED: 'child-removed',
       MOVED_KEYS: 'self-moved-keys',
       ADDED_TO_PARENT: 'self-added-to-parent',
-      REMOVED_FROM_PARENT: 'self-removed-from-parent',
-      BOUND_TO_ELEMENT: 'self-bound-to-element',
-      UNBOUND_FROM_ELEMENT: 'self-unbound-from-element'
+      REMOVED_FROM_PARENT: 'self-removed-from-parent'
    };
 
    /** Generates a key. */
@@ -383,18 +381,6 @@
          newParent.dispatchEvent_(ViewModel.Events.CHILD_ADDED, this, key);
       }
    }
-
-   // Called every time a view model is bound to a view.
-   ViewModel.prototype.boundToElement_ = function(element) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, Element);
-      this.dispatchEvent_(ViewModel.Events.BOUND_TO_ELEMENT, element);
-   };
-
-   // Called every time a view model is unbound from a view.
-   ViewModel.prototype.unboundFromElement_ = function(element) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, Element);
-      this.dispatchEvent_(ViewModel.Events.UNBOUND_FROM_ELEMENT, element);
-   };
 
    var handleChildrenObservableChanged = function(viewModel, key, changes) {
       // Determine the change status of each child, ignore any moves.
