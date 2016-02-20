@@ -47,6 +47,67 @@ app.bindRootViewModel()
 # ViewModel API
 
 ## ViewModel
+```
+CornerMan.ViewModel
+```
+
+### Events (_CornerMan.ViewModel.Events_)
+##### `CHILD_ADDED`
+Dispatched from a _ViewModel_ when a child is added to it.
+```js
+var viewModel = new ViewModel();
+viewModel.addListener(CornerMan.ViewModel.Events.CHILD_ADDED, function(event, child, key) {
+  //...
+});
+```
+##### `CHILD_MOVED`
+Dispatched from a _ViewModel_ when a child is moved from one key to another.
+```js
+var viewModel = new ViewModel();
+viewModel.addListener(CornerMan.ViewModel.Events.CHILD_MOVED,
+    function(event, child, oldKey, newKey) {
+  //...
+});
+```
+
+##### `CHILD_REMOVED`
+Dispatched from a _ViewModel_ when a child is removed from it.
+```js
+var viewModel = new ViewModel();
+viewModel.addListener(CornerMan.ViewModel.Events.CHILD_REMOVED, function(event, child, oldKey) {
+  //...
+});
+```
+
+##### `MOVED_KEYS`
+Dispatched from a _ViewModel_ when the _ViewModel_ moves from one key to another key but without its parent changing.
+```js
+var viewModel = new ViewModel();
+viewModel.addListener(CornerMan.ViewModel.Events.MOVED_KEYS,
+    function(event, parent, oldKey, newKey) {
+  //...
+});
+```
+
+##### `ADDED_TO_PARENT`
+Dispatched from a _ViewModel_ when the _ViewModel_ is added as a child to another _ViewModel_.
+```js
+var viewModel = new ViewModel();
+viewModel.addListener(CornerMan.ViewModel.Events.ADDED_TO_PARENT, function(event, parent, key) {
+  //...
+});
+```
+
+##### `REMOVED_FROM_PARENT`
+Dispatched from a _ViewModel_ when the _ViewModel_ is removed as a child from another _ViewModel_.
+```js
+var viewModel = new ViewModel();
+viewModel.addListener(CornerMan.ViewModel.Events.REMOVED_FROM_PARENT,
+    function(event, parent, oldKey)
+  //...
+});
+```
+### Methods
 #### childObservation(initialValue, options)
 * `initialValue` _ViewModel_
 * `options` _Object_
@@ -75,13 +136,8 @@ CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
 
 ### addListener(event, callback)
 * `event` _ViewModel.Events_
-  * `CHILD_ADDED`: Dispatched when a child is added
-  * `CHILD_MOVED`: Dispatched when a child is moved
-  * `CHILD_REMOVED`: Dispatched when a child is removed
-  * `MOVED_KEYS`: Dispatched when the ViewModel keeps the same parent but changes keys
-  * `ADDED_TO_PARENT`: Dispatched when the ViewModel is added as a child to another ViewModel
-  * `REMOVED_FROM_PARENT`: Dispatched when the ViewModel is removed as a child from another ViewModel
-* `callback` _Function_
+* `callback` _Function_ 
+* 
   
   
 
