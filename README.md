@@ -156,24 +156,24 @@ Removes the listener from the _ViewModel_.
 * `=>` _String_: Returns the template of this _ViewModel_ or null.
 
 #### getKeys()
-* `=>` _Array<String>_: Returns all of the child keys of this _ViewModel_.
+* `=>` _Array< String >_: Returns all of the child keys of this _ViewModel_.
 
 #### getKeysObservable()
-* `=>` _Observable<Array<String>>_: Returns an observable containing all of the child keys of this _ViewModel_.
+* `=>` _Observable< Array< String > >_: Returns an observable containing all of the child keys of this _ViewModel_.
 
 #### getChildren()
-* `=>` _Array<ViewModel>_: Returns all of the children of this _ViewModel_.
+* `=>` _Array< ViewModel >_: Returns all of the children of this _ViewModel_.
 
 #### getChildrenObservable()
-* `=>` _Observable<Array<ViewModel>>_: Returns an observable containing all of the children of this _ViewModel_.
+* `=>` _Observable< Array< ViewModel > >_: Returns an observable containing all of the children of this _ViewModel_.
 
 #### getChildrenForKey(key)
 * `key` _String_
-* `=>` _Array<ViewModel>_: Returns all of the children of this _ViewModel_ at the given key.
+* `=>` _Array< ViewModel >_: Returns all of the children of this _ViewModel_ at the given key.
 
 #### getChildrenObservableForKey(key)
 * `key` _String_
-* `=>` _Observable<Array<ViewModel>>_: Returns an observable containing all of the children of this _ViewModel_ at the given key.
+* `=>` _Observable< Array< ViewModel > >_: Returns an observable containing all of the children of this _ViewModel_ at the given key.
 
 #### getKeyForChild(viewModel)
 * `viewModel` _ViewModel_: Child of this _ViewModel_
