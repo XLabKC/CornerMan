@@ -472,6 +472,8 @@
          var callbacks = Array.prototype.slice.call(arguments, 1);
          this.routes_.push(new Route(route, callbacks));
       };
+      // Alias {@code get} to {@code registerRouter}.
+      Router.prototype.registerRoute = Router.prototype.get;
       // Starts the router listening. The initial URL is passed through the router immediately.
       Router.prototype.listen = function() {
          window.addEventListener("popstate", function() {
