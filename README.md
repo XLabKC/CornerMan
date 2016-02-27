@@ -28,7 +28,7 @@ Works with CoffeeScript class too:
 class HelloVM extends CornerMan.ViewModel
   constructor: ->
     super('hello-template')
-    @nameProvider = this.childObservable()
+    @nameProvider = @childObservable()
 
 class NameVM extends CornerMan.ViewModel
   constructor: ->
@@ -49,6 +49,15 @@ app.bindRootViewModel()
 ## ViewModel
 ```
 CornerMan.ViewModel
+```
+#### ViewModel(template)
+* `template` _String_ (optional): Template for the _ViewModel_.
+
+```js
+function FooViewModel() {
+  CornerMan.ViewModel.call(this, 'foo-template');
+}
+CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
 ```
 
 ### Events (_CornerMan.ViewModel.Events_)
@@ -129,13 +138,15 @@ CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
   * `key` _String_ (optional): The key to use for this observable
 * `=>` _Observable_: Returns a Knockout observable
 
-Creates an observable that contains an array of ViewModels. ViewModels added/removed from this observable be set as children of this observable. 
+Creates an observable that contains an array of <i>ViewModel</i>s. <i>ViewModel</i>s added/removed from this observable be set as children of this observable. 
 ```js
 function FooViewModel() {
   CornerMan.ViewModel.call(this);
   this.children = this.childrenObservable();
 };
 CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
+
+var fooVM = new FooViewModel();
 ```
 
 #### addListener(event, callback)
@@ -179,9 +190,179 @@ Removes the listener from the _ViewModel_.
 * `viewModel` _ViewModel_: Child of this _ViewModel_
 * `=>` _String_: The key of the given _ViewModel_ or null.
 
+#### addChildAtKey(key, viewModel)
+* `key` _String_
+* `viewModel` _ViewModel_: _ViewModel_ to add as a child of this _ViewModel_.
+* `=>` _Boolean_: Returns `true` if the _ViewModel_ was added as a child at the given key; returns `false` if the _ViewModel_ is already a child at the given key.
+
+If the key is not significant, consider using `#addChild` instead.
+
+#### addChildrenAtKey(key, viewModels)
+* `key` _String_
+* `viewModels` _Array< ViewModel >_: <i>ViewModel</i>s to add as childlren of this _ViewModel_.
+
+If the key is not significant, consider using #addChildren instead.
+
+#### addChild(viewModel)
+* `viewModel` _ViewModel_: _ViewModel_ to add as a child of this _ViewModel_.
+* `=>` _String_: Returns the key generated for the new child.
+
+To add a child with a given key, use `#addChildAtKey` instead.
+
+#### addChildren(viewModel)
+* `viewModel` _ViewModel_: _ViewModel_ to add as a child of this _ViewModel_.
+* `=>` _String_: Returns the key generated for the new child.
+
+To add childlren with a given key, use `#addChildlrenAtKey` instead.
+
+#### removeChildAtKey(key, viewModel)
+* `key` _String_
+* `viewModel` _ViewModel_: Child _ViewModel_ to remove.
+* `=>` _Boolean_: Returns `true` if the child exists at the given key and was removed from this _ViewModel_; returns `false` otherwise.
+
+#### removeChild(viewModel)
+* `viewModel` _ViewModel_: Child _ViewModel_ to remove.
+* `=>` _Boolean_: Returns `true` if the _ViewModel_ is a child of this _ViewModel_ and was removed; returns `false` otherwise.
+
+#### replaceChildrenAtKey(key, viewModels)
+* `key` _String_
+* `viewModels` _ViewModel_: <i>ViewModel</i>s to add as children of this _ViewModel_.
+Removes all child existing at the given key and then adds all of the given <i>ViewModel</i>s at that key.
 
 ## ContentViewModel
+```
+CornerMan.ContentViewModel
+```
+#### ContentViewModel(template)
+* `template` _String_ (optional): Template for the _ContentViewModel_.
+
+```js
+function FooContentViewModel() {
+  CornerMan.ContentViewModel.call(this, 'foo-template');
+}
+CornerMan.inherit(FooContentViewModel, CornerMan.ContentViewModel);
+
+var fooVM = new FooContentViewModel();
+```
+
+#### getControlsForKey(key)
+* `key` _String_
+* `=>` _Array< ControlViewModel >_: Returns the controls for the given key.
+
+Gets the controls for the given key; any controls at the same key associated with children of this content _ViewModel_ will be included. The controls are sorted by ascending using the `order` of the control _ViewModel_.
+
+#### getControlsObservableForKey(key)
+* `key` _String_
+* `=>` _Observable< Array< ControlViewModel > >_: Returns an observable containing the <i>ControlViewModel</i>s for the given key.
+
+Gets the observable that contains controls for the given key; any controls at the same key associated with children of this _ContentViewModel_ will be included. The controls are sorted by ascending using the `order` of the _ControlViewModel_.
+
+#### addControlAtKey(key, control)
+* `key` _String_
+* `control` _ControlViewModel_
+
+Adds the given _ControlViewModel_ to this _ContentViewModel_ at the given key.
 
 ## ControlViewModel
+```
+CornerMan.ControlViewModel
+```
+#### ControlViewModel(template, order)
+* `template` _String_ (optional): Template for the _ControlViewModel_.
+* `order` _Number_: Order of the _ControlViewModel_.
+
+```js
+function FooControlViewModel() {
+  CornerMan.ControlViewModel.call(this, 'foo-template', 0);
+}
+CornerMan.inherit(FooControlViewModel, CornerMan.ControlViewModel);
+
+var fooControl = new FooControlViewModel();
+```
+
+#### getOrder()
+* `=>` _Number_: Returns the order of this _ControlViewModel_.
+
+#### getOrder(order)
+* `order` _Number_
+
+Set the order of this _ControlViewModel_.
 
 # Router API
+
+## Router
+```
+CornerMan.Router
+```
+#### Router(on404)
+* `on404` _Function_ (optional): Called when there is no registered route matching the current URL.
+
+```js
+var router = new CornerMan.Router(function(url) {
+  console.log('Unknown page:', url);
+});
+```
+
+#### setOn404(on404)
+* `on404` _Function_ (optional): Called when there is no registered route matching the current URL.
+
+Registers a function to be called when there is no registered route matching the current URL.
+
+#### listen()
+Starts the router listening for navigations. The current URL is immediately passed through the router.
+
+#### registerRoute(route, callback [, callback ]...)
+* `route` _String_: Route to register the callback(s) with.
+* `callbacks` _Function_: Functions called when the URL matches the given route.
+
+The `router` parameter can be a simple path, such as `"/animals/dog"` or it can contains "slugs" that match variable URLs such as `"/animals/:animal"`. This second example will match any URL in the form of `"/animals/..."` but will not match `"/animals/.../foo"`.
+
+`#registerRoute` accepts a variable number of callbacks following the `route` parameter. The callbacks will be called in order with the following two parameters: `request` (_Object_) and `next` (_Function_). The `request` parameter has two properties: 1. `params` which contains the parameters parsed from the URL, and 2. `query` which contains the querystring parsed into an object. The `next` parameter is used to delegate to the next callback in the chain of registered callbacks. If a callback does not want of the following callbacks to be invoked, it simply shouldn't call `next`.
+```js
+var router = CornerMan.Router();
+
+router.registerRoute("/animals/:animal",
+    function(request, next) {
+      console.log('params', request.params);
+      console.log('query', request.query);
+      next();
+    },
+    function(request, next) {
+      console.log('Handling URL.');
+    },
+    function(request, next) {
+      console.log('Never called.');
+    });
+
+router.listen();
+
+// User navigates to: /animals/dog?name=Max
+
+// The following lines will be printed:
+//   params { animal: 'dog' }
+//   query { name: 'Max' }
+//   Handling URL.
+```
+
+#### get(route, callback [, callback ]...)
+* `route` _String_: Route to register the callback(s) with.
+* `callbacks` _Function_: Functions called when the URL matches the given route.
+
+Alias for #registerRoute.
+
+#### navigate(url)
+* `url` _String_
+
+Navigates to the given URL.
+
+#### hasHistory()
+* `=>` Returns whether there is a history entry to go back to.
+
+This is useful to know if the user navigated to the current URL through the router, or if the user landed directly on the current URL, say through a link from an external site.
+
+#### back()
+Navigates back to the previous URL.
+
+
+
+
