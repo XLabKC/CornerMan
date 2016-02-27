@@ -64,7 +64,9 @@ function runBrowserTest (browser, url, done) {
    // Try to build for browser.
    try {
       driver = new webdriver.Builder().withCapabilities(browser).build();   
-      driver.get(url)
+      driver.get(url).then(null, function () {
+         console.log("MADE IT:", arguments);
+      });
       driver.wait(function () {
          var script = 'if (window.getTestStatus) { return getTestStatus(); } else { return null; }'
          return driver.executeScript(script).then(function (result) {
