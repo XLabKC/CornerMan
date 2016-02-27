@@ -1,6 +1,7 @@
 # CornerMan
 Knockouts faithful servant.
-https://codeship.com/projects/eaad44c0-bfa1-0133-c929-7a4f14c96375/status?branch=master
+
+[ ![Codeship Status for XLabKC/CornerMan](https://codeship.com/projects/eaad44c0-bfa1-0133-c929-7a4f14c96375/status?branch=master)](https://codeship.com/projects/137159)
 
 ## Example
 ```js
