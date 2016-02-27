@@ -44,6 +44,69 @@ app.setRootViewModel(helloVM)
 app.bindRootViewModel()
 ```
 
+# CornerMan API
+The CornerMan API is exposed through the global variable `CornerMan`.
+```js
+// Classes
+CornerMan.Router            // Provides URL routing infastructure.
+CornerMan.ViewModel         // Base ViewModel
+CornerMan.ContentViewModel  // Subclass of ViewModel, provides propagated controls 
+CornerMan.ControlViewModel  // Subclass of ViewModel, used with the ContentViewModel
+CornerMan.Events            // Definition of events dispatched from ViewModel when changes occur
+
+// Utils
+CornerMan.inherit           // Helper for correctly setting up prototype chain when subclassing.
+CornerMan.create            // Initializes a new CornerMan instance
+```
+
+## CornerMan
+The global `CornerMan` variable is also a class providing shortcuts for setting up the app.
+
+#### CornerMan(rootViewModel)
+* `rootViewModel` _ViewModel_ (optional): The root _ViewModel_ of the application.
+
+It's easiest to have a single root _ViewModel_ that then has children for the various sections of the application.
+```js
+function FooViewModel() {
+  CornerMan.ViewModel.call(this, 'foo-template');
+}
+CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
+
+var rootViewModel = new FooViewModel();
+var app = new CornerMan(rootViewModel) // or CornerMan.create(rootViewModel)
+app.bindRootViewModel();
+```
+
+#### getRootViewModel()
+* `=>` _ViewModel_: Returns the root _ViewModel_ or null.
+
+#### setRootViewModel(rootViewModel)
+* `rootViewModel` _ViewModel_
+
+#### registerRoute(route, callback [, callback ]...)
+* `route` _String_: Route to register the callback(s) with.
+* `callbacks` _Function_: Functions called when the URL matches the given route.
+
+Adds a route to the _Router_ associated with this CornerMan instance. For more details, see _Router_`#registerRoute` below.
+
+#### get(route, callback [, callback ]...)
+* `route` _String_: Route to register the callback(s) with.
+* `callbacks` _Function_: Functions called when the URL matches the given route.
+
+Alas for `#registerRoute`.
+
+#### listen()
+Calls `#listen` on the  _Router_ associated with this CornerMan instance. For more details, see _Router_`#listen` below.
+
+#### setTemplateEngine(templateEngine)
+* `templateEngine` _ko.nativeTemplateEngine_: Subclass of Knockout's template engine.
+Sets a template engine that will be used for all `child` and `children` data bindings.
+
+#### bindRootViewModel(element)
+* `element` _Node_ (optional): DOM element to bind the root _ViewModel_ to.
+
+Binds the root _ViewModel_ to the given element or `document.body` if no element is given.
+
 # ViewModel API
 
 ## ViewModel
@@ -60,12 +123,12 @@ function FooViewModel() {
 CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
 ```
 
-### Events (_CornerMan.ViewModel.Events_)
+### Events (_CornerMan.Events_)
 ##### `CHILD_ADDED`
 Dispatched from a _ViewModel_ when a child is added to it.
 ```js
 var viewModel = new ViewModel();
-viewModel.addListener(CornerMan.ViewModel.Events.CHILD_ADDED, function(event, child, key) {
+viewModel.addListener(CornerMan.Events.CHILD_ADDED, function(event, child, key) {
   //...
 });
 ```
@@ -73,7 +136,7 @@ viewModel.addListener(CornerMan.ViewModel.Events.CHILD_ADDED, function(event, ch
 Dispatched from a _ViewModel_ when a child is moved from one key to another.
 ```js
 var viewModel = new ViewModel();
-viewModel.addListener(CornerMan.ViewModel.Events.CHILD_MOVED,
+viewModel.addListener(CornerMan.Events.CHILD_MOVED,
     function(event, child, oldKey, newKey) {
   //...
 });
@@ -83,7 +146,7 @@ viewModel.addListener(CornerMan.ViewModel.Events.CHILD_MOVED,
 Dispatched from a _ViewModel_ when a child is removed from it.
 ```js
 var viewModel = new ViewModel();
-viewModel.addListener(CornerMan.ViewModel.Events.CHILD_REMOVED, function(event, child, oldKey) {
+viewModel.addListener(CornerMan.Events.CHILD_REMOVED, function(event, child, oldKey) {
   //...
 });
 ```
@@ -92,7 +155,7 @@ viewModel.addListener(CornerMan.ViewModel.Events.CHILD_REMOVED, function(event, 
 Dispatched from a _ViewModel_ when the _ViewModel_ moves from one key to another key but without its parent changing.
 ```js
 var viewModel = new ViewModel();
-viewModel.addListener(CornerMan.ViewModel.Events.MOVED_KEYS,
+viewModel.addListener(CornerMan.Events.MOVED_KEYS,
     function(event, parent, oldKey, newKey) {
   //...
 });
@@ -102,7 +165,7 @@ viewModel.addListener(CornerMan.ViewModel.Events.MOVED_KEYS,
 Dispatched from a _ViewModel_ when the _ViewModel_ is added as a child to another _ViewModel_.
 ```js
 var viewModel = new ViewModel();
-viewModel.addListener(CornerMan.ViewModel.Events.ADDED_TO_PARENT, function(event, parent, key) {
+viewModel.addListener(CornerMan.Events.ADDED_TO_PARENT, function(event, parent, key) {
   //...
 });
 ```
@@ -111,7 +174,7 @@ viewModel.addListener(CornerMan.ViewModel.Events.ADDED_TO_PARENT, function(event
 Dispatched from a _ViewModel_ when the _ViewModel_ is removed as a child from another _ViewModel_.
 ```js
 var viewModel = new ViewModel();
-viewModel.addListener(CornerMan.ViewModel.Events.REMOVED_FROM_PARENT,
+viewModel.addListener(CornerMan.Events.REMOVED_FROM_PARENT,
     function(event, parent, oldKey)
   //...
 });
@@ -362,7 +425,4 @@ This is useful to know if the user navigated to the current URL through the rout
 
 #### back()
 Navigates back to the previous URL.
-
-
-
 
