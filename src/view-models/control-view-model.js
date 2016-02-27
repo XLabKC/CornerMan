@@ -19,7 +19,7 @@
    }
 
    ControlViewModel.prototype.setOrder = function(order) {
-      return this.order_(order);
+      this.order_(order);
    }
 
    cm.define('viewmodels.ControlViewModel', ControlViewModel);

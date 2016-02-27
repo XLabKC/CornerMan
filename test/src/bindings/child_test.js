@@ -121,6 +121,10 @@ describe('bindings.Child', function() {
       });
    });
 
+   describe('custom template engine', function() {
+      it('it should support custom template engine');
+   });
+
    // Possibly remove from framework. Somewhat against the design of MVVM.
    
    describe.skip('bound/unbound', function() {

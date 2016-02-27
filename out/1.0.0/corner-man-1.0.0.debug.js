@@ -338,7 +338,8 @@
             return {
                name: templateFn,
                foreach: children,
-               "if": ifCondition
+               "if": ifCondition,
+               templateEngine: ko.cornerManTemplateEngine || null
             };
          };
       };
@@ -369,7 +370,8 @@
          if (child) return createValueAccessorFn({
             name: child.template_,
             data: child,
-            "if": ifCondition
+            "if": ifCondition,
+            templateEngine: ko.cornerManTemplateEngine || null
          });
          if (children) return createTemplateAccessorFnForChildren(children, ifCondition);
          return createValueAccessorFn({});
@@ -546,7 +548,7 @@
          return this.order_();
       };
       ControlViewModel.prototype.setOrder = function(order) {
-         return this.order_(order);
+         this.order_(order);
       };
       cm.define("viewmodels.ControlViewModel", ControlViewModel);
    })();
@@ -627,9 +629,12 @@
          this.router.get.apply(this.router, arguments);
       };
       /** Add alias for {@code get}. */
-      CornerMan.prototype.addRouter = CornerMan.prototype.get;
+      CornerMan.prototype.registerRoute = CornerMan.prototype.get;
       CornerMan.prototype.listen = function() {
          this.router.listen();
+      };
+      CornerMan.prototype.setTemplateEngine = function(templateEngine) {
+         ko.cornerManTemplateEngine = templateEngine;
       };
       CornerMan.prototype.bindRootViewModel = function(element) {
          ChildBinding.attachToKnockout();

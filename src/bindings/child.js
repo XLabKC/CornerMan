@@ -23,7 +23,8 @@
          return {
             'name': templateFn,
             'foreach': children,
-            'if': ifCondition
+            'if': ifCondition,
+            'templateEngine': ko.cornerManTemplateEngine || null
          };
       };
    };
@@ -85,7 +86,8 @@
          return createValueAccessorFn({
             'name': child.template_,
             'data': child,
-            'if': ifCondition
+            'if': ifCondition,
+            'templateEngine': ko.cornerManTemplateEngine || null
          });
       } else if (children) {
          return createTemplateAccessorFnForChildren(children, ifCondition);

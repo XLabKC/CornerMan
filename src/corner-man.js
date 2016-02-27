@@ -38,11 +38,16 @@
    }
 
    /** Add alias for {@code get}. */
-   CornerMan.prototype.addRouter = CornerMan.prototype.get;
+   CornerMan.prototype.registerRoute = CornerMan.prototype.get;
 
    CornerMan.prototype.listen = function() {
       this.router.listen();
    };
+
+   CornerMan.prototype.setTemplateEngine = function(templateEngine) {
+      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ko.nativeTemplateEngine)
+      ko.cornerManTemplateEngine = templateEngine;
+   }
 
    CornerMan.prototype.bindRootViewModel = function(element) {
       if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(Node));
