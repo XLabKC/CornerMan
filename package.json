@@ -2,7 +2,9 @@
   "name": "corner-man",
   "version": "1.0.0",
   "description": "Knockouts faithful servant.",
-  "main": "index.js",
+  "engines": {
+    "node": "4.2.3"
+  },
   "directories": {
     "test": "test"
   },
@@ -14,6 +16,9 @@
   "keywords": [
     "knockout",
     "framework",
+    "viewmodel",
+    "spa",
+    "single page application",
     "router"
   ],
   "author": "Blake VanLandingham, Hunter Browning",
@@ -24,7 +29,7 @@
     "colors": "^1.1.2",
     "express": "^4.13.3",
     "mincer": "^1.4.0",
-    "selenium-webdriver": "^2.48.2",
+    "selenium-webdriver": "^2.52.0",
     "uglify-js2": "^2.1.11"
   }
 }

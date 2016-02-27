@@ -64,21 +64,21 @@ function runBrowserTest (browser, url, done) {
    // Try to build for browser.
    try {
       driver = new webdriver.Builder().withCapabilities(browser).build();   
+      driver.get(url);
+      driver.wait(function () {
+         var script = 'if (window.getTestStatus) { return getTestStatus(); } else { return null; }'
+         return driver.executeScript(script).then(function (result) {
+            status = result;
+            return result && result.finished;
+         });
+      }, 10000).then(function () {
+         driver.quit();
+         done(null, status);
+      });
    } catch (err) {
       // This browser is not available.
       return done(err);
    }
-   driver.get(url);
-   driver.wait(function () {
-      var script = 'if (window.getTestStatus) { return getTestStatus(); } else { return null; }'
-      return driver.executeScript(script).then(function (result) {
-         status = result;
-         return result && result.finished;
-      });
-   }, 10000).then(function () {
-      driver.quit();
-      done(null, status);
-   });
 };
 
 function outputResult (result) {
