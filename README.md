@@ -28,7 +28,7 @@ Works with CoffeeScript class too:
 class HelloVM extends CornerMan.ViewModel
   constructor: ->
     super('hello-template')
-    @nameProvider = this.childObservable()
+    @nameProvider = @childObservable()
 
 class NameVM extends CornerMan.ViewModel
   constructor: ->
@@ -129,7 +129,7 @@ CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
   * `key` _String_ (optional): The key to use for this observable
 * `=>` _Observable_: Returns a Knockout observable
 
-Creates an observable that contains an array of ViewModels. ViewModels added/removed from this observable be set as children of this observable. 
+Creates an observable that contains an array of <i>ViewModel</i>s. <i>ViewModel</i>s added/removed from this observable be set as children of this observable. 
 ```js
 function FooViewModel() {
   CornerMan.ViewModel.call(this);
@@ -179,9 +179,73 @@ Removes the listener from the _ViewModel_.
 * `viewModel` _ViewModel_: Child of this _ViewModel_
 * `=>` _String_: The key of the given _ViewModel_ or null.
 
+#### addChildAtKey(key, viewModel)
+* `key` _String_
+* `viewModel` _ViewModel_: _ViewModel_ to add as a child of this _ViewModel_.
+* `=>` _Boolean_: Returns `true` if the _ViewModel_ was added as a child at the given key; returns `false` if the _ViewModel_ is already a child at the given key.
+
+If the key is not significant, consider using `#addChild` instead.
+
+#### addChildrenAtKey(key, viewModels)
+* `key` _String_
+* `viewModels` _Array< ViewModel >_: <i>ViewModel</i>s to add as childlren of this _ViewModel_.
+
+If the key is not significant, consider using #addChildren instead.
+
+#### addChild(viewModel)
+* `viewModel` _ViewModel_: _ViewModel_ to add as a child of this _ViewModel_.
+* `=>` _String_: Returns the key generated for the new child.
+
+To add a child with a given key, use `#addChildAtKey` instead.
+
+#### addChildren(viewModel)
+* `viewModel` _ViewModel_: _ViewModel_ to add as a child of this _ViewModel_.
+* `=>` _String_: Returns the key generated for the new child.
+
+To add childlren with a given key, use `#addChildlrenAtKey` instead.
+
+#### removeChildAtKey(key, viewModel)
+* `key` _String_
+* `viewModel` _ViewModel_: Child _ViewModel_ to remove.
+* `=>` _Boolean_: Returns `true` if the child exists at the given key and was removed from this _ViewModel_; returns `false` otherwise.
+
+#### removeChild(viewModel)
+* `viewModel` _ViewModel_: Child _ViewModel_ to remove.
+* `=>` _Boolean_: Returns `true` if the _ViewModel_ is a child of this _ViewModel_ and was removed; returns `false` otherwise.
+
+#### replaceChildrenAtKey(key, viewModels)
+* `key` _String_
+* `viewModels` _ViewModel_: <i>ViewModel</i>s to add as children of this _ViewModel_.
+Removes all child existing at the given key and then adds all of the given <i>ViewModel</i>s at that key.
 
 ## ContentViewModel
 
+#### getControlsForKey(key)
+* `key` _String_
+* `=>` _Array< ControlViewModel >_: Returns the controls for the given key.
+
+Gets the controls for the given key; any controls at the same key associated with children of this content _ViewModel_ will be included. The controls are sorted by ascending using the `order` of the control _ViewModel_.
+
+#### getControlsObservableForKey(key)
+* `key` _String_
+* `=>` _Observable< Array< ControlViewModel > >_: Returns an observable containing the <i>ControlViewModel</i>s for the given key.
+
+Gets the observable that contains controls for the given key; any controls at the same key associated with children of this _ContentViewModel_ will be included. The controls are sorted by ascending using the `order` of the _ControlViewModel_.
+
+#### addControlAtKey(key, control)
+* `key` _String_
+* `control` _ControlViewModel_
+
+Adds the given _ControlViewModel_ to this _ContentViewModel_ at the given key.
+
 ## ControlViewModel
+
+#### getOrder()
+* `=>` _Number_: Returns the order of this _ControlViewModel_.
+
+#### getOrder(order)
+* `order` _Number_
+
+Set the order of this _ControlViewModel_.
 
 # Router API
