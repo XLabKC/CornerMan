@@ -50,6 +50,15 @@ app.bindRootViewModel()
 ```
 CornerMan.ViewModel
 ```
+#### ViewModel(template)
+* `template` _String_ (optional): Template for the _ViewModel_.
+
+```js
+function FooViewModel() {
+  CornerMan.ViewModel.call(this, 'foo-template');
+}
+CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
+```
 
 ### Events (_CornerMan.ViewModel.Events_)
 ##### `CHILD_ADDED`
@@ -136,6 +145,8 @@ function FooViewModel() {
   this.children = this.childrenObservable();
 };
 CornerMan.inherit(FooViewModel, CornerMan.ViewModel);
+
+var fooVM = new FooViewModel();
 ```
 
 #### addListener(event, callback)
@@ -219,6 +230,20 @@ To add childlren with a given key, use `#addChildlrenAtKey` instead.
 Removes all child existing at the given key and then adds all of the given <i>ViewModel</i>s at that key.
 
 ## ContentViewModel
+```
+CornerMan.ContentViewModel
+```
+#### ContentViewModel(template)
+* `template` _String_ (optional): Template for the _ContentViewModel_.
+
+```js
+function FooContentViewModel() {
+  CornerMan.ContentViewModel.call(this, 'foo-template');
+}
+CornerMan.inherit(FooContentViewModel, CornerMan.ContentViewModel);
+
+var fooVM = new FooContentViewModel();
+```
 
 #### getControlsForKey(key)
 * `key` _String_
@@ -239,6 +264,21 @@ Gets the observable that contains controls for the given key; any controls at th
 Adds the given _ControlViewModel_ to this _ContentViewModel_ at the given key.
 
 ## ControlViewModel
+```
+CornerMan.ControlViewModel
+```
+#### ControlViewModel(template, order)
+* `template` _String_ (optional): Template for the _ControlViewModel_.
+* `order` _Number_: Order of the _ControlViewModel_.
+
+```js
+function FooControlViewModel() {
+  CornerMan.ControlViewModel.call(this, 'foo-template', 0);
+}
+CornerMan.inherit(FooControlViewModel, CornerMan.ControlViewModel);
+
+var fooControl = new FooControlViewModel();
+```
 
 #### getOrder()
 * `=>` _Number_: Returns the order of this _ControlViewModel_.
@@ -249,3 +289,80 @@ Adds the given _ControlViewModel_ to this _ContentViewModel_ at the given key.
 Set the order of this _ControlViewModel_.
 
 # Router API
+
+## Router
+```
+CornerMan.Router
+```
+#### Router(on404)
+* `on404` _Function_ (optional): Called when there is no registered route matching the current URL.
+
+```js
+var router = new CornerMan.Router(function(url) {
+  console.log('Unknown page:', url);
+});
+```
+
+#### setOn404(on404)
+* `on404` _Function_ (optional): Called when there is no registered route matching the current URL.
+
+Registers a function to be called when there is no registered route matching the current URL.
+
+#### listen()
+Starts the router listening for navigations. The current URL is immediately passed through the router.
+
+#### registerRoute(route, callback [, callback ]...)
+* `route` _String_: Route to register the callback(s) with.
+* `callbacks` _Function_: Functions called when the URL matches the given route.
+
+The `router` parameter can be a simple path, such as `"/animals/dog"` or it can contains "slugs" that match variable URLs such as `"/animals/:animal"`. This second example will match any URL in the form of `"/animals/..."` but will not match `"/animals/.../foo"`.
+
+`#registerRoute` accepts a variable number of callbacks following the `route` parameter. The callbacks will be called in order with the following two parameters: `request` (_Object_) and `next` (_Function_). The `request` parameter has two properties: 1. `params` which contains the parameters parsed from the URL, and 2. `query` which contains the querystring parsed into an object. The `next` parameter is used to delegate to the next callback in the chain of registered callbacks. If a callback does not want of the following callbacks to be invoked, it simply shouldn't call `next`.
+```js
+var router = CornerMan.Router();
+
+router.registerRoute("/animals/:animal",
+    function(request, next) {
+      console.log('params', request.params);
+      console.log('query', request.query);
+      next();
+    },
+    function(request, next) {
+      console.log('Handling URL.');
+    },
+    function(request, next) {
+      console.log('Never called.');
+    });
+
+router.listen();
+
+// User navigates to: /animals/dog?name=Max
+
+// The following lines will be printed:
+//   params { animal: 'dog' }
+//   query { name: 'Max' }
+//   Handling URL.
+```
+
+#### get(route, callback [, callback ]...)
+* `route` _String_: Route to register the callback(s) with.
+* `callbacks` _Function_: Functions called when the URL matches the given route.
+
+Alias for #registerRoute.
+
+#### navigate(url)
+* `url` _String_
+
+Navigates to the given URL.
+
+#### hasHistory()
+* `=>` Returns whether there is a history entry to go back to.
+
+This is useful to know if the user navigated to the current URL through the router, or if the user landed directly on the current URL, say through a link from an external site.
+
+#### back()
+Navigates back to the previous URL.
+
+
+
+
