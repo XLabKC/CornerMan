@@ -64,7 +64,7 @@ function runBrowserTest (browser, url, done) {
    // Try to build for browser.
    try {
       driver = new webdriver.Builder().withCapabilities(browser).build();   
-      driver.get(url);
+      driver.get(url)
       driver.wait(function () {
          var script = 'if (window.getTestStatus) { return getTestStatus(); } else { return null; }'
          return driver.executeScript(script).then(function (result) {
@@ -74,6 +74,11 @@ function runBrowserTest (browser, url, done) {
       }, 10000).then(function () {
          driver.quit();
          done(null, status);
+      }, function (err) {
+         try {
+            driver.quit();
+         } catch (err) {}
+         done(err);
       });
    } catch (err) {
       // This browser is not available.
