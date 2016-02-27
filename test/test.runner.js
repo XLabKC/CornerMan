@@ -65,7 +65,7 @@ function runBrowserTest (browser, url, done) {
    try {
       driver = new webdriver.Builder().withCapabilities(browser).build();   
       driver.get(url).then(null, function () {
-         console.log("MADE IT:", arguments);
+         // Capture the exception thrown by driver if browser doesn't exist.
       });
       driver.wait(function () {
          var script = 'if (window.getTestStatus) { return getTestStatus(); } else { return null; }'
