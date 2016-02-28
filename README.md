@@ -1,6 +1,7 @@
 # CornerMan
 Knockouts faithful servant.
-https://codeship.com/projects/eaad44c0-bfa1-0133-c929-7a4f14c96375/status?branch=master
+
+[ ![Codeship Status for XLabKC/CornerMan](https://codeship.com/projects/eaad44c0-bfa1-0133-c929-7a4f14c96375/status?branch=master)](https://codeship.com/projects/137159)
 
 ## Example
 ```js
@@ -292,6 +293,12 @@ To add childlren with a given key, use `#addChildlrenAtKey` instead.
 * `key` _String_
 * `viewModels` _ViewModel_: <i>ViewModel</i>s to add as children of this _ViewModel_.
 Removes all child existing at the given key and then adds all of the given <i>ViewModel</i>s at that key.
+
+#### ViewModel.generateKey([length] [, availableCharacters])
+* `length` _String_ (optional): Length of the key to generate, defaults to 10.
+* `availableCharacters` _String_ (optional): String containing all of the available characters to use when generating the key. Defaults to alphanumeric.
+
+Generates a key with the given length using the available characters.
 
 ## ContentViewModel
 ```
