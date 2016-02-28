@@ -25,7 +25,9 @@
    (function() {
       var AVAILABLE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
       var RANDOM_KEY_LENGTH = 10;
+      var ID_KEY_LENGTH = 16;
       function ViewModel(template) {
+         this.id_ = ViewModel.generateKey(ID_KEY_LENGTH);
          this.template_ = ko.observable(template || null);
          this.hasTemplate = ko.pureComputed(this.computeHasTemplate_.bind(this));
          this.parent_ = ko.observable(null);
@@ -35,8 +37,7 @@
          this.keysToChildrenObservables_ = {};
          this.childrenObservable_ = ko.pureComputed(this.computeChildrenObservable_.bind(this));
          this.eventsToListeners_ = {};
-         // Map from children to keys at which they used to reside.
-         this.recentlyRemovedChildrenToKeys_ = {};
+         this.childrenIdsToKeys_ = {};
       }
       ViewModel.Events = {
          CHILD_ADDED: "child-added",
@@ -172,13 +173,8 @@
       };
       /** Returns the key for the given child view model or null. */
       ViewModel.prototype.getKeyForChild = function(viewModel) {
-         var keys = this.keys_();
          if (viewModel.getParent() != this) return null;
-         for (var i = 0, len = keys.length; i < len; i++) {
-            var childrenObservable = this.getChildrenObservableForKey(keys[i]);
-            if (-1 != childrenObservable.indexOf(viewModel)) return keys[i];
-         }
-         return null;
+         return this.childrenIdsToKeys_[viewModel.id_] || null;
       };
       /** Adds the given view model as a child of this view model at the given key. */
       ViewModel.prototype.addChildAtKey = function(key, viewModel) {
@@ -187,7 +183,7 @@
             // Handle when a child is moving from one key to another within the same parent.
             var currentKey = currentParent.getKeyForChild(viewModel);
             if (currentKey === key) return false;
-            this.removeChildAtKeySilently_(currentKey, viewModel);
+            this.removeChildAtKeySilently_(currentKey, viewModel, false);
             // We can't use #getChildrenObservableForKey because we need to add the view model to the
             // new observable array before adding the key so that any subscribes will be able to access
             // the children immediately.
@@ -195,6 +191,7 @@
                this.keysToChildrenObservables_[key] = ko.observableArray([ viewModel ]);
                this.keys_.push(key);
             }
+            this.childrenIdsToKeys_[viewModel.id_] = key;
             viewModel.dispatchEvent_(ViewModel.Events.MOVED_KEYS, this, currentKey, key);
             this.dispatchEvent_(ViewModel.Events.CHILD_MOVED, viewModel, currentKey, key);
             return true;
@@ -206,6 +203,8 @@
             this.keysToChildrenObservables_[key] = ko.observableArray([ viewModel ]);
             this.keys_.peek().push(key);
          } else this.keysToChildrenObservables_[key].peek().push(viewModel);
+         this.childrenIdsToKeys_[viewModel.id_] = key;
+         // Remove from the existing parent, if any.
          if (currentParent) {
             var currentKey = currentParent.getKeyForChild(viewModel);
             currentParent.removeChildAtKeySilently_(currentKey, viewModel, true);
@@ -276,7 +275,7 @@
          if (!this.keysToChildrenObservables_[key]) return false;
          var result = this.keysToChildrenObservables_[key].remove(viewModel);
          if (!result || !result.length) return false;
-         storeRemovedChild && (this.recentlyRemovedChildrenToKeys_[viewModel] = key);
+         storeRemovedChild || delete this.childrenIdsToKeys_[viewModel.id_];
          return true;
       };
       ViewModel.prototype.dispatchEvent_ = function() {
@@ -287,9 +286,9 @@
       };
       ViewModel.prototype.onParentWillChange_ = function(oldParent) {
          if (oldParent) {
-            var key = oldParent.recentlyRemovedChildrenToKeys_[this];
+            var key = oldParent.childrenIdsToKeys_[this.id_];
             if (key) {
-               delete oldParent.recentlyRemovedChildrenToKeys_[this];
+               delete oldParent.childrenIdsToKeys_[this.id_];
                this.dispatchEvent_(ViewModel.Events.REMOVED_FROM_PARENT, oldParent, key);
                oldParent.dispatchEvent_(ViewModel.Events.CHILD_REMOVED, this, key);
             }
