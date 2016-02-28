@@ -101,7 +101,7 @@ function uglify(source, options) {
 }
 
 function prependCommentHeader(source) {
-   return '/*!\n' +
+   return '/**\n' +
           ' * CornerMan JavaScript library v' + config.version + '\n' +
           ' * License: MIT (http://www.opensource.org/licenses/mit-license.php)\n' +
           ' */\n' + source;
