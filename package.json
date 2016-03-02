@@ -9,7 +9,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node test/test.js",
+    "test": "gom-jabbar -d ./test/src -r ./test/resources/vendor -x ./test/resources/test",
     "build": "node bin/build",
     "examples": "node examples/examples.runner.js"
   },
@@ -28,6 +28,7 @@
     "coffee-script": "^1.10.0",
     "colors": "^1.1.2",
     "express": "^4.13.3",
+    "gom-jabbar": "^1.0.1",
     "mincer": "^1.4.0",
     "selenium-webdriver": "^2.52.0",
     "uglify-js2": "^2.1.11"
