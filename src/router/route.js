@@ -6,10 +6,10 @@
       var path = path.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
       // Capture the slugs (/:something) and replace them with regex fragment.
-      this.slugs_ = (path.match(/\/:(\w+)+/g) || []).map(function(slug) {
+      this.slugs_ = (path.match(/\/:(\w+)/g) || []).map(function(slug) {
          return slug.substring(2);
       });
-      this.regex_ = new RegExp(path.replace(/\/:(\w+)+/g, '/([\\w-]+)+'));
+      this.regex_ = new RegExp(path.replace(/\/:(\w+)/g, '/([\\w-]+)'));
       this.callbacks_ = callbacks;
    };
 
@@ -28,7 +28,7 @@
       var match = this.regex_.exec(path);
       if (match != null && match[0].length == path.length) {
          var req = {}
-         
+
          // Add the slugs to the request object.
          if (this.slugs_) {
             req.params = {}
