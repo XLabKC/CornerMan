@@ -1,7 +1,8 @@
 # CornerMan
 Knockouts faithful servant.
-
 [ ![Codeship Status for XLabKC/CornerMan](https://codeship.com/projects/eaad44c0-bfa1-0133-c929-7a4f14c96375/status?branch=master)](https://codeship.com/projects/137159)
+
+CornerMan adds a little sanity to single page Knockout apps. It provides a dead simple router and a concrete viewmodel class with a parent-child relationship magic.
 
 ## Example
 ```js
@@ -25,7 +26,7 @@ var app = CornerMan.create();
 app.setRootViewModel(helloVM);
 app.bindRootViewModel();
 ```
-Works with CoffeeScript class too:
+Or in CoffeeScript:
 ```coffeescript
 class HelloVM extends CornerMan.ViewModel
   constructor: ->
