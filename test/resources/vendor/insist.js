@@ -1,8 +1,7 @@
 /**
- * insist-type v1.2.1
+ * insist-type v1.3.0
  */
- 
-(function () {
+ (function () {
 var root = this;
 var previousInstance = root.insist;
 var isDisabled = false;
@@ -305,7 +304,7 @@ var isValidType = function (type) {
    }
    if (type instanceof ArrayOf) return isValidType(type.type);
    if (type instanceof EnumType) return (type.enumerable instanceof Object);
-   return (type instanceof Function);
+   return (type instanceof Object);
 };
 
 /**
