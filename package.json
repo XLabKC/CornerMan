@@ -1,6 +1,6 @@
 {
   "name": "corner-man",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Knockouts faithful servant.",
   "engines": {
     "node": "4.2.3"
@@ -29,6 +29,7 @@
     "colors": "^1.1.2",
     "express": "^4.13.3",
     "gom-jabbar": "^1.0.1",
+    "insist-types": "^1.4.3",
     "mincer": "^1.4.0",
     "selenium-webdriver": "^2.52.0",
     "uglify-js2": "^2.1.11"

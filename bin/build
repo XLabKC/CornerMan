@@ -4,8 +4,9 @@ var coffee = require('coffee-script');
 var fs = require('fs');
 var Mincer = require('mincer');
 var path = require('path');
-var config = require('../package.json')
-var UglifyJS = require("uglify-js2")
+var config = require('../package.json');
+var UglifyJS = require('uglify-js2');
+var Insist = require('insist-types');
 
 /** Create mincer environment. */
 var environment = new Mincer.Environment();
@@ -22,10 +23,9 @@ generateMinifiedSource(asset, false);
  */
 function generateFullSource(asset, includeTypeAsserts) {
    source = wrapInFunction(asset.toString());
-   source = uglify(source, {
-      includeTypeAsserts: includeTypeAsserts,
-      beautify: true
-   });
+   if (!includeTypeAsserts) {
+      source = removeInsist(source);
+   }
    // Remove require comments.
    source = source.replace(/\s*\/\/\s*\(=\)\srequire\s[\w/.-]+/g, '');
    source = source.replace(/\n\s*\n\n+/g, '');
@@ -35,7 +35,11 @@ function generateFullSource(asset, includeTypeAsserts) {
 
 function generateMinifiedSource(source, includeTypeAsserts) {
    source = wrapInFunction(source);
-   source = uglify(source, includeTypeAsserts);
+   if (!includeTypeAsserts) {
+      source = removeInsist(source);
+   }
+   console.log(source)
+   source = uglify(source, {beautify: false});
    source = prependCommentHeader(source);
    outputSource(source, includeTypeAsserts ? 'min.asserts' : 'min')
 }
@@ -47,51 +51,43 @@ function wrapInFunction(source) {
    return '(function() {\n' + source + '\n})();\n';
 }
 
-function uglify(source, options) {
-   options = options || {};
-   var includeTypeAsserts = options.includeTypeAsserts;
-   var beautify = options.beautify;
+function removeInsist(source) {
+   var remover = new Insist.Remover({
+      aliases: {
+         args: 'cm.assertArgs',
+         ofType: 'cm.assertOfType'
+      }
+   });
+   return remover.removeInsist(source);
+}
 
+function uglify(source) {
+   
    // Compress.
    var ast = UglifyJS.parse(source);
    ast.figure_out_scope();
    var compressorOptions = {
-      sequences     : !beautify,  // join consecutive statemets with the “comma operator”
-      properties    : !beautify,  // optimize property access: a["foo"] → a.foo
+      sequences     : true,  // join consecutive statemets with the “comma operator”
+      properties    : true,  // optimize property access: a["foo"] → a.foo
       dead_code     : true,  // discard unreachable code
       drop_debugger : true,  // discard “debugger” statements
-      unsafe        : !beautify,      // some unsafe optimizations (see below)
-      conditionals  : !(beautify && includeTypeAsserts),  // optimize if-s and conditional expressions
-      comparisons   : !beautify,  // optimize comparisons
-      evaluate      : !(beautify && includeTypeAsserts),  // evaluate constant expressions
-      booleans      : !beautify,  // optimize boolean expressions
-      loops         : !beautify,  // optimize loops
+      unsafe        : true,      // some unsafe optimizations (see below)
+      conditionals  : true,  // optimize if-s and conditional expressions
+      comparisons   : true,  // optimize comparisons
+      evaluate      : true,  // evaluate constant expressions
+      booleans      : true,  // optimize boolean expressions
+      loops         : true,  // optimize loops
       unused        : true,  // drop unused variables/functions
-      hoist_funs    : !beautify,  // hoist function declarations
-      hoist_vars    : !beautify,      // hoist variable declarations
-      if_return     : !beautify,  // optimize if-s followed by return/continue
-      join_vars     : !beautify,  // join var declarations
-      cascade       : !beautify,  // try to cascade `right` into `left` in sequences
-      side_effects  : !beautify  // drop side-effect-free statements
-   }
-   if (!includeTypeAsserts) {
-      compressorOptions.global_defs = {
-         CM_ASSERT_TYPES: false
-      }
+      hoist_funs    : true,  // hoist function declarations
+      hoist_vars    : true,      // hoist variable declarations
+      if_return     : true,  // optimize if-s followed by return/continue
+      join_vars     : true,  // join var declarations
+      cascade       : true,  // try to cascade `right` into `left` in sequences
+      side_effects  : true  // drop side-effect-free statements
    }
    var compressor = UglifyJS.Compressor(compressorOptions);
    ast = ast.transform(compressor);
    
-   if (beautify) {
-      var stream = UglifyJS.OutputStream({
-         indent_level: 3,
-         beautify: true,
-         comments: true
-      });
-      ast.print(stream); 
-      return stream.toString();
-   }
-
    // Mangle.
    ast.figure_out_scope();
    ast.compute_char_frequency();

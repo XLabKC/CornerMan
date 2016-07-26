@@ -6,7 +6,7 @@
    var ID_KEY_LENGTH = 16;
 
    function ViewModel(template) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(String))
+      cm.assertArgs(arguments, cm.optional(String))
       this.id_ = ViewModel.generateKey(ID_KEY_LENGTH);
       this.template_ = ko.observable(template || null);
       this.hasTemplate = ko.pureComputed(this.computeHasTemplate_.bind(this));
@@ -41,10 +41,9 @@
          length = arguments[0];
          characters = arguments[1];
       }
-      if (CM_ASSERT_TYPES) {
-         cm.assertOfType(length, Number);
-         cm.assertOfType(characters, String);
-      }
+      cm.assertOfType(length, Number);
+      cm.assertOfType(characters, String);
+      
       keySegments = [];
       for (var i = 0; i < length; i++) {
          keySegments.push(characters.charAt(Math.floor(Math.random() * characters.length)));
@@ -57,14 +56,14 @@
     * of the given view model, at the given key.
     */
    ViewModel.createChildObservable = function(viewModel, key, initialValue) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ViewModel, String, cm.optional(ViewModel));
+      cm.assertArgs(arguments, ViewModel, String, cm.optional(ViewModel));
       key = key || ViewModel.generateKey();
       var observable = ko.pureComputed({
          read: function() {
             return viewModel.getChildrenForKey(key)[0] || null;
          },
          write: function(child) {
-            if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(ViewModel));
+            cm.assertArgs(arguments, cm.optional(ViewModel));
             if (viewModel.getChildrenForKey(key)[0] !== child) {
                viewModel.replaceChildrenAtKey(key, child ? [child] : []);
             }
@@ -84,9 +83,7 @@
     * (view models) are set as children of the given view model, at the given key.
     */
    ViewModel.createChildrenObservable = function(viewModel, key, initialValue) {
-      if (CM_ASSERT_TYPES) {
-         cm.assertArgs(arguments, ViewModel, String, cm.optional(cm.arrayOf(ViewModel)));
-      }
+      cm.assertArgs(arguments, ViewModel, String, cm.optional(cm.arrayOf(ViewModel)));
       var observable = ko.observableArray();
       observable.subscribe(
             handleChildrenObservableChanged.bind(viewModel, viewModel, key), null, 'arrayChange');
@@ -118,7 +115,7 @@
 
    /** Adds a listener for the given event. */
    ViewModel.prototype.addListener = function(event, callback) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.ofEnum(ViewModel.Events), Function);
+      cm.assertArgs(arguments, cm.ofEnum(ViewModel.Events), Function);
       if (!this.eventsToListeners_[event]) {
          this.eventsToListeners_[event] = [];
       }
@@ -127,7 +124,7 @@
 
    /** Removes the listener. */
    ViewModel.prototype.removeListener = function(listener) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, Function);
+      cm.assertArgs(arguments, Function);
       var found = false;
       for (var type in this.eventsToListeners_) {
          var listeners = this.eventsToListeners_[type];
@@ -174,13 +171,13 @@
 
    /** Returns the children of this view model for the given key. */
    ViewModel.prototype.getChildrenForKey = function(key) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String);
+      cm.assertArgs(arguments, String);
       return this.getChildrenObservableForKey(key)();
    };
 
    /** Returns an observable containing the children of this view model for the given key. */
    ViewModel.prototype.getChildrenObservableForKey = function(key) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String);
+      cm.assertArgs(arguments, String);
       if (!this.keysToChildrenObservables_[key]) {
          this.keysToChildrenObservables_[key] = ko.observableArray([]);
          this.keys_.push(key);
@@ -190,7 +187,7 @@
 
    /** Returns the key for the given child view model or null. */
    ViewModel.prototype.getKeyForChild = function(viewModel) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ViewModel);
+      cm.assertArgs(arguments, ViewModel);
       if (viewModel.getParent() != this) {
          return null;
       }
@@ -199,7 +196,7 @@
 
    /** Adds the given view model as a child of this view model at the given key. */
    ViewModel.prototype.addChildAtKey = function(key, viewModel) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, ViewModel);
+      cm.assertArgs(arguments, String, ViewModel);
       var currentParent = viewModel.getParent();
       if (currentParent === this) {
          // Handle when a child is moving from one key to another within the same parent.
@@ -254,7 +251,7 @@
 
    /** Adds the given view models as children of this view model at the given key. */
    ViewModel.prototype.addChildrenAtKey = function(key, viewModels) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, cm.arrayOf(ViewModel));
+      cm.assertArgs(arguments, String, cm.arrayOf(ViewModel));
       for (var i = 0, len = viewModels.length; i < len; i++) {
          this.addChildAtKey(key, viewModels[i]);
       };
@@ -264,7 +261,7 @@
     * Adds the given view model as a child of this view model at a random key and returns the key.
     */
    ViewModel.prototype.addChild = function(viewModel) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ViewModel);
+      cm.assertArgs(arguments, ViewModel);
       var key = ViewModel.generateKey();
       this.addChildAtKey(key, viewModel);
       return key;
@@ -274,7 +271,7 @@
     * Adds the given view models as children of this view model at a random key and returns the key.
     */
    ViewModel.prototype.addChildren = function(viewModel) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.arrayOf(ViewModel));
+      cm.assertArgs(arguments, cm.arrayOf(ViewModel));
       var key = ViewModel.generateKey();
       this.addChildrenAtKey(key, viewModel);
       return key;
@@ -285,7 +282,7 @@
     * successful.
     */
    ViewModel.prototype.removeChildAtKey = function(key, viewModel) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, ViewModel);
+      cm.assertArgs(arguments, String, ViewModel);
       var wasRemoved = this.removeChildAtKeySilently_(key, viewModel, true /* storeRemovedChild */);
       if (wasRemoved) {
          viewModel.parent_(null);   
@@ -298,7 +295,7 @@
     * successful.
     */
    ViewModel.prototype.removeChild = function(viewModel) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, ViewModel);
+      cm.assertArgs(arguments, ViewModel);
       var key = this.getKeyForChild(viewModel);
       if (key) {
          return this.removeChildAtKey(key, viewModel);
@@ -311,7 +308,7 @@
     * this view model.
     */
    ViewModel.prototype.replaceChildrenAtKey = function(key, viewModels) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, cm.arrayOf(ViewModel));
+      cm.assertArgs(arguments, String, cm.arrayOf(ViewModel));
       var children = this.getChildrenForKey(key);
       for (var i = 0, len = children.length; i < len; i++) {
          this.removeChildAtKey(key, children[i]);
@@ -334,7 +331,7 @@
    };
 
    ViewModel.prototype.removeChildAtKeySilently_ = function(key, viewModel, storeRemovedChild) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, ViewModel, cm.optional(Boolean));
+      cm.assertArgs(arguments, String, ViewModel, cm.optional(Boolean));
       if (!this.keysToChildrenObservables_[key]) {
          return false;
       }

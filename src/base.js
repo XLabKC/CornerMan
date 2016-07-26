@@ -21,22 +21,17 @@
       }
    };
 
-   if (typeof CM_ASSERT_TYPES === 'undefined') {
-      CM_ASSERT_TYPES = true;
-   }
-   if (CM_ASSERT_TYPES) {
-      var noop = function() {};
-      var insist = scope.insist || {};
-      scope.cm.assertArgs = scope.assertArgs || insist.args || noop;
-      scope.cm.assertOfType = scope.assertOfType || insist.ofType || noop;
-      scope.cm.assertType = scope.assertType || insist.isType || noop;
-      scope.cm.getNameForValue = scope.getNameForValue || insist.getNameForValue || noop;
-      scope.cm.getNameForType = scope.getNameForType || insist.getNameForType || noop;
-      scope.cm.arrayOf = scope.arrayOf || insist.arrayOf || noop;
-      scope.cm.nullable = scope.nullable || insist.nullable || noop;
-      scope.cm.anything = scope.anything || insist.anything || noop;
-      scope.cm.optional = scope.optional || insist.optional || noop;
-      scope.cm.ofEnum = scope.ofEnum || insist['enum'] || noop;
-   }
+   var noop = function() {};
+   var insist = scope.insist || {};
+   scope.cm.assertArgs = scope.assertArgs || insist.args || noop;
+   scope.cm.assertOfType = scope.assertOfType || insist.ofType || noop;
+   scope.cm.assertType = scope.assertType || insist.isType || noop;
+   scope.cm.getNameForValue = scope.getNameForValue || insist.getNameForValue || noop;
+   scope.cm.getNameForType = scope.getNameForType || insist.getNameForType || noop;
+   scope.cm.arrayOf = scope.arrayOf || insist.arrayOf || noop;
+   scope.cm.nullable = scope.nullable || insist.nullable || noop;
+   scope.cm.anything = scope.anything || insist.anything || noop;
+   scope.cm.optional = scope.optional || insist.optional || noop;
+   scope.cm.ofEnum = scope.ofEnum || insist['enum'] || noop;
 
 })(this);

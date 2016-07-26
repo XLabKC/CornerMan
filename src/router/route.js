@@ -2,7 +2,7 @@
 
 (function() {
    function Route(path, callbacks) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String, cm.arrayOf(Function))
+      cm.assertArgs(arguments, String, cm.arrayOf(Function))
       var path = path.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
       // Capture the slugs (/:something) and replace them with regex fragment.
@@ -14,7 +14,7 @@
    };
 
    Route.prototype.attemptToHandleUrl = function(url) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String);
+      cm.assertArgs(arguments, String);
       this.regex_.lastIndex = 0;
 
       // Extract the path from the url and test against that.

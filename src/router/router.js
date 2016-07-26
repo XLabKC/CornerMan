@@ -7,22 +7,22 @@
    var Route = cm.require('router.Route');
 
    function Router(on404) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, cm.optional(Function));
+      cm.assertArgs(arguments, cm.optional(Function));
       this.on404_ = on404 || (function(url) { console.log('404 at', url); });
       this.routes_ = [];
       this.historyLength_ = 0;
    }
 
    Router.prototype.setOn404 = function(on404) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, Function);
+      cm.assertArgs(arguments, Function);
       this.on404_ = on404;
    };
 
    Router.prototype.get = function(/* route [, callbacks...] */) {
       var route = arguments[0];
       var callbacks = Array.prototype.slice.call(arguments, 1);
-      if (CM_ASSERT_TYPES) cm.assertOfType(route, String);
-      if (CM_ASSERT_TYPES) cm.assertOfType(callbacks, cm.arrayOf(Function));
+      cm.assertOfType(route, String);
+      cm.assertOfType(callbacks, cm.arrayOf(Function));
       this.routes_.push(new Route(route, callbacks));
    };
 
@@ -53,7 +53,7 @@
 
    // Navigates to the supplied URL.
    Router.prototype.navigate = function(url) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String)
+      cm.assertArgs(arguments, String)
       if (this.addOriginIfNeeded_(url) == window.location.href) {
          return;
       }
@@ -76,7 +76,7 @@
       
    // Calls the proper callbacks based on the supplied URL.
    Router.prototype.notify_ = function(url) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, String)
+      cm.assertArgs(arguments, String)
       for (var i = 0, len = this.routes_.length; i < len; i++) {
          if (this.routes_[i].attemptToHandleUrl(url)) {
             return;

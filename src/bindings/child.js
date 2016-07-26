@@ -13,9 +13,7 @@
    };
 
    var createTemplateAccessorFnForChildren = function(children, ifCondition) {
-      if (CM_ASSERT_TYPES) {
-         cm.assertArgs(arguments, cm.arrayOf(ViewModel), [cm.nullable(Function), Boolean]);  
-      }
+      cm.assertArgs(arguments, cm.arrayOf(ViewModel), [cm.nullable(Function), Boolean]);
       var templateFn = function(child) {
          return child.getTemplate();
       }
@@ -30,16 +28,15 @@
    };
 
    var makeTemplateValueAccessor = function(element, valueAccessor, viewModel, asChildren) {
-      if (CM_ASSERT_TYPES) cm.assertArgs(arguments, Node, Function, cm.anything(), Boolean);
+      cm.assertArgs(arguments, Node, Function, cm.anything(), Boolean);
       var value = ko.unwrap(valueAccessor());
       
       // If there is no value, just return null and don't do anything.
       if (!value) {
          return null;
       }
-      if (CM_ASSERT_TYPES) {
-         cm.assertOfType(value, [String, ViewModel, cm.arrayOf(ViewModel), Object]);
-      }
+      cm.assertOfType(value, [String, ViewModel, cm.arrayOf(ViewModel), Object]);
+
       var child = null;
       var children = null;
       var ifCondition = true
@@ -48,7 +45,7 @@
             // A view model is being supplied as the value.
             child = value;
          } else if (value instanceof Array) {
-            if (CM_ASSERT_TYPES) cm.assertOfType(value, cm.arrayOf(ViewModel));
+            cm.assertOfType(value, cm.arrayOf(ViewModel));
             // An array of view models is being supplied. Take the first child if asChildren option
             // is false.
             if (asChildren) {
@@ -63,18 +60,18 @@
          }
       };
       if (value instanceof ViewModel || value instanceof Array) {
-         if (CM_ASSERT_TYPES) cm.assertOfType(value, [ViewModel, cm.arrayOf(ViewModel)]);
+         cm.assertOfType(value, [ViewModel, cm.arrayOf(ViewModel)]);
          captureChildOrChildren(value);
       } else {
          // If the view model is not being supplied as a value, the view model parent must be
          // supplied.
-         if (CM_ASSERT_TYPES) cm.assertOfType(viewModel, ViewModel);
+         cm.assertOfType(viewModel, ViewModel);
          if (typeof value === 'string') {
             // A key to the child was provided as the value, use the parent view model to fetch the
             // actual child.
             captureChildOrChildren(viewModel.getChildrenForKey(value));
          } else {
-            if (CM_ASSERT_TYPES) cm.assertOfType(value, Object);
+            cm.assertOfType(value, Object);
             var childrenArray = (typeof value['data'] === 'string') ?
                   viewModel.getChildrenForKey(value['data']) :
                   value['data'];
